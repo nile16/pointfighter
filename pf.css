@@ -1,0 +1,285 @@
+
+#wrapper {
+	position: absolute;
+	z-index:0;
+	top:0; 
+	bottom:0; 
+	right:0; 
+	left:0; 
+	overflow:hidden; 
+	background-color:grey;
+	font-family:Sans-serif;
+}
+
+#main {
+	position:absolute;
+	z-index:1;
+	background-color:#EEEEEE;
+	overflow:hidden;
+	}
+	
+#buttonRow {
+	position:absolute;
+	z-index:2;
+	color:white;
+	border-radius:5px;
+	border:ridge 2px;
+	background-color:rgba(0, 0, 0, 0.4);
+	display:none;
+}
+
+.button {
+	position:relative;
+	float:left;
+}
+
+.button img {
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-right: -50%;
+	transform: translate(-50%, -50%)
+}
+
+
+#back {
+	position:relative;
+	height:100%;
+	width:15%;
+	float:left;
+}
+
+#back img {
+	position: absolute;
+	height:80%;
+	top: 50%;
+	left: 50%;
+	margin-right: -50%;
+	transform: translate(-50%, -50%);
+	cursor: pointer; 
+}
+
+
+#map {
+	width:100%;  
+	height:100%;  
+	z-index:1; 
+	display:block; 
+	position:absolute;
+}
+	
+#message {
+	width:280px; 
+	z-index:8; 
+	display:none; 
+	background-color:#EFE004;
+	color:white; 
+	padding:10px; 
+	text-align:center;
+	box-shadow: 0px 0px 5px #777777; 
+	border:ridge 2px;
+	border-radius: 5px;
+	font-size:20px; 
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-right: -50%;
+	transform: translate(-50%, -50%);
+}
+
+#mapBox {
+	position: absolute;
+	z-index:5; 
+	top: 50%;
+	left: 50%;
+	margin-right: -50%;
+	transform: translate(-50%, -50%);
+	color:white; 
+	font-size:20px;
+	text-align:center;
+	display:none;
+}
+
+.mapButton{
+	position:relative;
+	left: 50%;
+	transform: translate(-50%, 0%);
+	width:120px; 
+	z-index:8; 
+	font-size:16px;
+	padding:10px; 
+	border:ridge 2px;
+	border-radius: 5px;
+	cursor: pointer; 
+}
+
+#profileBox {
+	position: absolute;
+	z-index:5; 
+	top:0; 
+	bottom:0; 
+	right:0; 
+	left:0; 
+	color:white; 
+	font-size:20px;
+	text-align:center;
+	display:none;
+}
+
+#loginBox {
+	position: absolute;
+	z-index:6; 
+	top: 50%;
+	left: 50%;
+	margin-right: -50%;
+	transform: translate(-50%, -50%);
+	color:white; 
+	font-size:20px;
+	text-align:center;
+	display:block;
+}
+
+#loginLogo {
+	width:120px;
+}
+
+
+.loginButton{
+	position:relative;
+	left: 50%;
+	transform: translate(-50%, 0%);
+	width:120px; 
+	z-index:8; 
+	font-size:0px;
+	padding:0px; 
+	border:ridge 2px;
+	border-radius: 5px;
+	cursor: pointer; 
+}
+
+#message img {
+	height:50px; 
+}
+
+
+#help {
+	width:90%; 
+	height:100%; 
+	z-index:10; 
+	display:none; 
+	position: absolute;
+	font-size:24px; 
+	padding-left:5%; 
+	padding-right:5%; 
+	background-color:#FFFFFF; 
+	overflow:scroll;
+}
+
+#dimmer {
+	width:100%;  
+	height:100%;  
+	z-index:4; 
+	display:block;  
+	position:absolute; 
+	background-color:#000000; 
+	opacity:0.6;
+}
+
+#zoomControl {
+	width:36px;  
+	height:72px; 
+	z-index:2; 
+	display:block; 
+	position:absolute; 
+	float:right; 
+	bottom:30px; 
+	right:10px; 
+	overflow:hidden; 
+	background-color:#FFFFFF; 
+	box-shadow: 0px 0px 5px #777777; 
+	border-radius: 5px;
+}
+
+
+.zoomButton {
+	width:36px;  
+	height:36px;  
+	position:relative; 
+	float:left; 
+	text-align:center;
+}
+
+.iconImage {
+	position:absolute;
+	width: 16px; 
+	height: 16px;
+	margin:0px;
+}
+
+.iconName {
+	position:absolute;
+	bottom:16px;
+	left:16px;          
+	font-size:12px;
+	white-space: nowrap;
+	color:white;
+	background-color:rgba(0, 0, 0, 0.4);
+	border-radius: 3px;
+	border:ridge 2px;
+	padding:0px 3px 0px 3px;
+}
+
+
+
+@media (orientation: landscape) {
+	#buttonRow {
+		left:10px;
+		width:46px;
+		height:336px;
+		top: 50%;
+		transform: translate(0%, -50%);
+		}
+	#main {
+		height:100%;
+		left:0px;
+		right:0px;
+		}
+	.button {
+		width:100%;
+		height:20%;
+		}
+	.button img {
+		width:70%;
+		}
+}
+
+@media (orientation: portrait) {
+	#buttonRow {
+		bottom:10px;
+		width:336px;
+		height:46px;
+		left: 50%;
+		transform: translate(-50%, 0%);
+		}
+	#main {
+		width:100%;
+		top:0px;
+		bottom:0px;
+		}
+	.button {
+		width:20%;
+		height:100%;
+		}
+	.button img {
+		height:70%;
+		}
+}
+
+
+
+a:link    {color:#ffffff;text-decoration:none;}  /* unvisited link */
+a:visited {color:#ffffff;text-decoration:none;}  /* visited link */
+a:hover   {color:#FF0000;text-decoration:none;}  /* mouse over link */
+a:active  {color:#FF0000;text-decoration:none;}  /* selected link */ 

@@ -1,0 +1,87 @@
+
+POST https://nile16.nu:1208/
+Data:
+{
+	acc : account (google or facebook),
+	tok : token provided by google or facebook,
+	com : command, 'lin' for login
+}
+
+Example:
+{
+	acc : 'google',
+	tok : 'jhgJyjyKUYfytkFkfUyf.jgLJggygLglluuYuyuyguy',
+	com : 'lin'
+}
+
+Response:
+{
+	err : false,
+	una : 'Kent Johansson',
+	pic : 'kent.se/mypic.jpg',
+	hea : 50,
+	lev : 20
+}
+
+
+POST https://nile16.nu:1208/
+Data:
+{
+	acc : account (google or facebook),
+	tok : token provided by google or facebook,
+	com : command, 'uud' for update user data,
+	una : username (optional),
+	pic : url to picture (optional),
+	hea : delta (optional),
+	lev : delta (optional)
+}
+
+Example:
+{
+	acc : 'google',
+	tok : 'jhgJyjyKUYfytkFkfUyf.jgLJggygLglluuYuyuyguy',
+	com : 'uud',
+	una : 'Kent Johansson',
+	pic : 'kent.se/mypic.jpg',
+	hea : -3,
+	lev : 4
+}
+
+Response:
+{
+	err : false,
+	una : 'Kent Johansson',
+	pic : 'kent.se/mypic.jpg',
+	hea : 50,
+	lev : 20
+}
+
+POST https://nile16.nu:1208/
+Data:
+{
+	acc : account (google or facebook),
+	tok : token provided by google or facebook,
+	com : command, 'pos' for positions,
+	pos : client's position
+}
+
+Example:
+{
+	acc : 'google',
+	tok : 'jhgJyjyKUYfytkFkfUyf.jgLJggygLglluuYuyuyguy',
+	com : 'pos',
+	pos : [56.78901,12.23456]
+}
+
+Response:
+{
+	err : false,
+	ous : [
+			[[56.16022,15.13355],'Kent Andersson'],
+			[[57.60221,16.33551],'Kurt Andersson'],
+			[[58.02211,17.35522],'Knut Andersson']
+	]
+}
+
+
+

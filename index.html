@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<meta charset='utf-8' />
+<title>PointFighter</title>
+<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0,  minimum-scale=1.0"> 
+<meta name="google-signin-client_id" content="219844659207-ct72vss7fte5ct6ka8j0jcuocjcrevpl.apps.googleusercontent.com">
+<link rel="stylesheet" href="pf.css" />
+<link rel="stylesheet" href="leaflet/leaflet.css" />
+<script src="leaflet/leaflet.js"></script> 
+<script src="screenfull.js"></script>
+<script src="https://apis.google.com/js/platform.js" ></script>
+<script src="//connect.facebook.net/en_US/sdk.js" id="facebook-jssdk" ></script>
+
+</head>                                                                                
+                                                                                  
+                                                                                  
+<body>                                                                            
+   <div  id='wrapper' >
+	<div id='dimmer' ></div>
+    <div id='buttonRow' >
+		<div class="button" id='b1' ><IMG id="zoomToUserButton" src="icons/b1.png"  title="Centre map at your position" onclick="zoomToUser();" ></div>
+		<div class="button" id='b2' ><IMG id="loginButton"      src="icons/b2.png"  title="Logout" onclick="logout();" ></div>
+		<div class="button" id='b3' ><IMG id="profileButton"    src="icons/b3.png"  title="Menu" onclick="showProfileBox();" ></div>
+		<div class="button" id='b4' ><IMG id="mapButton"        src="icons/b4.png"  title="Maps" onclick="showMapMenu();" ></div>
+		<div class="button" id='b5' ><IMG id="fullScreenButton" src="icons/b51.png" title="Request Full Screen" onclick="screenfull.request();" ></div>
+	</div>
+    <div id='main' >
+		<div id='map' ></div>
+<!--		<div id='zoomControl' >
+			<div class="zoomButton" ><IMG align="middle" style="width:100%; height:100%;" src="icons/c1.png" title="Zoom In"  onclick="map.zoomIn();" ></div>
+			<div class="zoomButton" ><IMG align="middle" style="width:100%; height:100%;" src="icons/c2.png" title="Zoom Out" onclick="map.zoomOut();" ></div>
+		</div>-->
+
+		<div id='help' ></div>
+	</div>
+	<div id='loginBox' >
+		<img id="loginLogo" src="logo.png"><br><br>
+		<div class="loginButton" onclick="loginGoogle()"><img src="g.png"></div><br>
+		<div class="loginButton" onclick="loginFacebook()"><img src="fb.png"></div>
+		<!--<div class="loginButton" onclick="hideLoginBox()">Cancel</div>-->
+	</div>
+	<div id='mapBox' >
+		<div class="mapButton" onclick="setMap(mapbox)">OSM (Mapbox)</div><br>
+		<div class="mapButton" onclick="setMap(osm)">OSM (Mapnik)</div><br>
+		<div class="mapButton" onclick="setMap(googleStreets)">Google Street</div><br>
+		<div class="mapButton" onclick="setMap(googleTerrain)">Google Terrain</div><br>
+		<div class="mapButton" onclick="setMap(googleSat)">Google Earth</div><br>
+		<!--<div class="loginButton" onclick="hideLoginBox()">Cancel</div>-->
+	</div>
+	<div id='profileBox' >
+		<br><br>
+		<img id="userPicDiv">
+		<div id="userHealthDiv"></div>
+		<div id="userLevelDiv"></div>
+		<div id="userNameDiv"></div>
+		<br>
+		<button onclick="hideProfileBox();">DONE</button>
+	</div>
+	<div id='message' ></div>
+   </div>
+</body>
+
+
+<script>
+
+
+//Initiate Facebook
+window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '360731194320516',
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v2.8'
+    });
+    FB.AppEvents.logPageView(); 
+  	FB.getLoginStatus(function(response) {
+		if (response.status=="connected") onSignInFacebook();
+	});
+  };
+
+//Initiate Google  
+gapi.load('auth2', function() {
+	gapi.auth2.init({
+		client_id: '219844659207-ct72vss7fte5ct6ka8j0jcuocjcrevpl.apps.googleusercontent.com'
+	});
+});
+
+//Start login with Facebook
+function loginFacebook(){
+	FB.login(onSignInFacebook);
+}
+
+//Start login with Google
+function loginGoogle(){
+	gapi.auth2.getAuthInstance().signIn().then(onSignInGoogle);
+}
+
+//Show the login buttons for Google and Facebook
+function showLoginBox(){
+    document.getElementById('dimmer').style.display     = 'block'; 
+	document.getElementById('loginBox').style.display   = 'block';
+    document.getElementById('buttonRow').style.display  = 'none'; 
+}
+
+//Hide the login buttons for Google and Facebook
+function hideLoginBox(){
+    document.getElementById('dimmer').style.display     = 'none'; 
+	document.getElementById('loginBox').style.display   = 'none';
+	document.getElementById('buttonRow').style.display  = 'block'; 
+}
+
+//Show the profile page
+function showProfileBox(){
+	document.getElementById('dimmer').style.display     = 'block'; 
+	document.getElementById('profileBox').style.display = 'block';
+	document.getElementById('buttonRow').style.display  = 'none'; 
+}
+
+//Hide the profile page
+function hideProfileBox(){
+	document.getElementById('dimmer').style.display     = 'none'; 
+	document.getElementById('profileBox').style.display = 'none';
+	document.getElementById('buttonRow').style.display  = 'block'; 
+}
+
+function onSignInGoogle(googleUser){
+    if (user.account=="facebook") FB.logout();
+	hideLoginBox();
+	//document.getElementById('loginButton').setAttribute( "src", "icons/logout.png" ); 
+	//document.getElementById('loginButton').setAttribute( "title", "Logout" ); 
+	//document.getElementById('loginButton').setAttribute( "onClick", "javascript: logout();" ); 
+	var profile = googleUser.getBasicProfile();
+	//user.id=profile.getId();
+	user.name=profile.getName();
+	//user.token=String(googleUser.getAuthResponse().id_token);
+	user.account="google";
+	//user.image=profile.getImageUrl();
+	console.log("logged in google");
+	startGPS();
+	startPosUpdates();
+	loginServer();
+}
+
+function onSignInFacebook(){
+    if (user.account=="google") gapi.auth2.getAuthInstance().signOut();
+	FB.getLoginStatus(function(response) {
+		if (response.status=="connected"){
+			hideLoginBox();
+			//document.getElementById('loginButton').setAttribute( "src", "icons/logout.png" ); 
+			//document.getElementById('loginButton').setAttribute( "title", "Logout" ); 
+			//document.getElementById('loginButton').setAttribute( "onClick", "javascript: logout();" );
+			//user.token=String(response.authResponse.accessToken);
+			user.account="facebook";
+			console.log("logged in facebook");
+			startPosUpdates();
+			loginServer();
+			FB.api('/me', function(response) {
+				user.name=response.name;
+				startGPS();
+			//	user.id=response.id;
+			//	user.image=response.picture;
+			});
+		}
+	});
+}
+
+function logout(){
+    if (user.account=="google") gapi.auth2.getAuthInstance().signOut();
+    if (user.account=="facebook")FB.logout();
+	showLoginBox();
+	//document.getElementById('loginButton').setAttribute( "src", "icons/login.png" ); 
+	//document.getElementById('loginButton').setAttribute( "title", "Login" ); 
+	//document.getElementById('loginButton').setAttribute( "onClick", "javascript: showLoginBox();" );
+	user.account=false;
+	user.name=false;
+	user.id=false;
+	user.picture=false;
+	map.removeLayer(marker);
+	marker=false;
+	markers.clearLayers();
+	stopPosUpdates();
+	stopGPS();
+}
+
+  if (screenfull.enabled) {
+    document.addEventListener(screenfull.raw.fullscreenchange, function () {
+        if (screenfull.isFullscreen) {
+		  document.getElementById('fullScreenButton').setAttribute( "src", "icons/b50.png" ); 
+          document.getElementById('fullScreenButton').setAttribute( "title", "Exit Full Screen" ); 
+          document.getElementById('fullScreenButton').setAttribute( "onClick", "javascript: screenfull.exit();" ); 
+        } else {
+		  document.getElementById('fullScreenButton').setAttribute( "src", "icons/b51.png" ); 
+          document.getElementById('fullScreenButton').setAttribute( "title", "Request Full Screen" ); 
+          document.getElementById('fullScreenButton').setAttribute( "onClick", "javascript: screenfull.request();" ); 
+        }
+	  } );
+	}
+
+function loginServer(){
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "https://nile16.nu:1208", true);
+	xhr.onreadystatechange = function(){
+
+		if(this.readyState == 4 && this.status == 200) {
+			console.log(xhr.responseText);
+			var userdata = JSON.parse(xhr.responseText);
+			user.una = userdata.una;
+			user.pic = userdata.pic;
+			user.hea = userdata.hea;
+			user.lev = userdata.lev;
+			userPicDiv.src          = user.pic;
+			userNameDiv.innerText   = user.una;
+			userHealthDiv.innerText = user.hea;
+			userLevelDiv.innerText  = user.lev;
+		}
+	}
+	xhr.send(JSON.stringify({com:"lin",acc:user.account,tok:user.token()}));
+}
+	
+function updatePosition(pos){
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "https://nile16.nu:1208/", true);
+	xhr.onreadystatechange = function(){
+
+		if(this.readyState == 4 && this.status == 200) {
+			var pmarkers = [];
+			other_users = JSON.parse(xhr.responseText).ous;
+			for (i=0;i<other_users.length;i++){
+				var icon = L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" src="icons/3.png"></div><div class="iconName" onclick="event.stopPropagation()">'+other_users[i][1]+'</div>',iconAnchor:[8, 8]});
+				pmarkers[i] = L.marker(other_users[i][0],{draggable:false, icon:icon}).addTo(map);
+			}
+			markers.clearLayers();
+			markers = L.featureGroup(pmarkers);
+			markers.addTo(map);
+		}
+	}
+	xhr.send(JSON.stringify({com:"pos",acc:user.account,tok:user.token(),pos:pos}));
+}
+
+
+
+function startGPS(){
+	posWatch=navigator.geolocation.watchPosition(
+		function(pos){ 
+			//console.log('Your current position is:');
+			//console.log('Latitude : ' + pos.coords.latitude);
+			//console.log('Longitude: ' + pos.coords.longitude);
+			//console.log('More or less ' + pos.coords.accuracy + ' meters.');
+			if (pos.coords.accuracy<50000)
+				position_found(pos); 
+			else
+				position_not_found();
+		},
+		function(error){ 
+			position_not_found(); 
+		},
+		{ enableHighAccuracy:true, timeout:15000, maximumAge:10000 });
+}
+  
+function stopGPS(){
+	navigator.geolocation.clearWatch(posWatch);
+}  
+  
+  
+
+  function position_found(pos) {
+	console.log("posfound");
+    if (!marker){
+		var icon = L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" src="icons/0.png"></div><div class="iconName" onclick="event.stopPropagation()">'+user.name+'</div>',iconAnchor:[8, 8]});
+		marker = L.marker([pos.coords.latitude, pos.coords.longitude], {draggable:false, icon:icon}).addTo(map);
+		//marker.bindPopup("Du är här!",{offset:[0,-10]});
+		}
+	else{
+		marker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
+		//marker.update();
+		}
+	checkDistances();
+  }
+
+  function position_not_found() {
+	//console.log("posnotfound");
+    if (marker){
+		map.removeLayer(marker);
+		marker=false;}
+  }
+
+  function startPosUpdates(){
+	posUpdates = setInterval(function(){
+	//console.log("posup");
+		if (marker)	updatePosition([parseFloat(marker.getLatLng().lat.toFixed(5)), parseFloat(marker.getLatLng().lng.toFixed(5))]);
+	}, 5000);
+  }
+
+  function stopPosUpdates(){
+	clearInterval(posUpdates);
+  }
+  
+  
+function zoomToUser(){
+	if (marker) map.setView(marker.getLatLng(), 16);
+}  
+ 
+function showMapMenu(){
+    document.getElementById('dimmer').style.display  = 'block'; 
+    document.getElementById('mapBox').style.display  = 'block'; 
+}
+ 
+function setMap(m){
+		map.removeLayer(currentMap); 
+		currentMap=m;
+		map.addLayer(m); 
+		document.getElementById('dimmer').style.display  = 'none'; 
+		document.getElementById('mapBox').style.display  = 'none'; 
+}
+  
+  function showMessage(mess) {
+    document.getElementById('dimmer').style.display  = 'block'; 
+    document.getElementById('message').innerHTML = mess; 
+    document.getElementById('message').style.display = 'block';
+  }  
+  
+  function closeMessage() {
+    document.getElementById('message').style.display = 'none'; 
+    document.getElementById('dimmer').style.display  = 'none'; 
+  }
+  
+function distance(lat1, lon1, lat2, lon2) {
+	var radlat1 = Math.PI * lat1/180
+	var radlat2 = Math.PI * lat2/180
+	var theta = lon1-lon2
+	var radtheta = Math.PI * theta/180
+	var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+	dist = Math.acos(dist)
+	dist = dist * 180/Math.PI
+	dist = dist * 60 * 1.1515 * 1609
+	return dist
+}
+
+function checkDistances(){
+	var lat = marker.getLatLng().lat;
+	var lng = marker.getLatLng().lng;
+	for (i=0;i<targets.length;i++){
+		if (distance(lat,lng,targets[i].getLatLng().lat,targets[i].getLatLng().lng)<10){
+			targets[i].setIcon(markerIcon2);
+		}
+	}
+}
+
+
+  // OSM layer
+  var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  var osmAttrib='<a href="http://openstreetmap.org" target="_blank">OpenStreetMap</a>';
+  var osm = new L.TileLayer(osmUrl, {minZoom:1, maxZoom:19});		
+ 
+  // Mapbox layer
+  //L.mapbox.accessToken = 'pk.eyJ1Ijoic2VhcmNob3NtIiwiYSI6ImNpZ21vN2J0NzAwMjJhYWx4Zm95aTk1NW8ifQ.JmAKk8EayQ6cwMDJp-ZwVg';
+  var mapbox = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + 'pk.eyJ1Ijoic2VhcmNob3NtIiwiYSI6ImNpZ21vN2J0NzAwMjJhYWx4Zm95aTk1NW8ifQ.JmAKk8EayQ6cwMDJp-ZwVg', {minZoom:1, maxZoom: 18});
+
+  // Google Map layer
+  var googleAttrib='<a href="http://www.google.com/maps" target="_blank">GoogleMaps</a>';
+  var googleStreets = new L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{minZoom:1, maxZoom: 19, subdomains:['mt0','mt1','mt2','mt3']});
+
+  // Google terrain layer
+  var googleTerrain = new L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{minZoom:1, maxZoom: 19, subdomains:['mt0','mt1','mt2','mt3']});
+
+  // Google Earth layer
+  var googleSat = new L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{minZoom:1, maxZoom: 19, subdomains:['mt0','mt1','mt2','mt3']});
+
+  
+  var map = new L.Map('map', { doubleClickZoom:false, zoomControl:false, maxBounds:([[90,-270],[-90,270]]) });
+  //var zoom = L.control.zoom( { position:'topleft' } ).addTo(map); 
+  //L.control.scale({imperial:false}).addTo(map);
+  map.attributionControl.setPrefix("");
+
+
+var user={};
+
+var posUpdates;
+var posWatch;
+
+user.token=function (){
+    if (user.account=="google")		return gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+    if (user.account=="facebook")	return FB.getAuthResponse().accessToken;
+	return false;
+}
+
+
+  var targets=[];
+  var marker = false;
+  var markers = L.featureGroup();
+  
+  //Set initial map view
+  var currentMap=mapbox;
+  
+  //var markerIcon  = L.icon({iconUrl: "icons/0.png",iconAnchor:[8, 8],});
+  var markerIcon1 = L.icon({iconUrl: "icons/1.png",iconAnchor:[8, 8],});
+  var markerIcon2 = L.icon({iconUrl: "icons/2.png",iconAnchor:[8, 8],});
+  var ios     = /(iPad|iPhone|iPod)/g.test(navigator.userAgent);
+  var android = /(android)/i.test(navigator.userAgent);
+
+  // Add layers to map
+  currentMap.addTo(map);
+
+
+  // map.addLayer(markers);
+  map.fitBounds([[0,-180],[0,180]]);
+
+  
+  var track=[
+	[56.15944,15.13235],
+	[56.15909,15.13057],
+	[56.15991,15.12972],
+	[56.16125,15.12998],
+	[56.16195,15.13078],
+	[56.16286,15.13042],
+	[56.16354,15.12897],
+	[56.16420,15.12761],
+	[56.16445,15.12871],
+	[56.16456,15.13089],
+	[56.16456,15.13291],
+	[56.16452,15.13492],
+	[56.16431,15.13745],
+	[56.16272,15.13684],
+	[56.16242,15.13718],
+	[56.16178,15.13657],
+	[56.16050,15.13603],
+	[56.15967,15.13567],
+	[56.15906,15.13473],
+	[56.15909,15.13358],
+	];  
+
+function loadTrack(){
+	hideMenuBox();
+	for (i=0;i<track.length;i++)
+		targets[i]=L.marker(track[i],{draggable:false, icon:markerIcon1}).addTo(map);
+}
+
+  </script>                              
+
+</html>
+
