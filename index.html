@@ -53,11 +53,9 @@
 	<div id='profileBox' >
 		<br><br>
 		<img id="userPicDiv">
-		<div id="userHealthDiv"></div>
-		<div id="userLevelDiv"></div>
-		<div id="userNameDiv"></div>
+		<div id="userNameDiv" contenteditable="true"></div>
 		<br>
-		<button onclick="hideProfileBox();">DONE</button>
+		<button onclick="saveProfile();">DONE</button>
 	</div>
 	<div id='message' ></div>
    </div>
@@ -65,6 +63,9 @@
 
 
 <script>
+
+//		<div id="userHealthDiv"></div>
+//		<div id="userLevelDiv"></div>
 
 
 //Initiate Facebook
@@ -119,28 +120,50 @@ function showProfileBox(){
 	document.getElementById('buttonRow').style.display  = 'none'; 
 }
 
-//Hide the profile page
-function hideProfileBox(){
+function removeMyMarkerFromMap(){
+	if (marker){
+		map.removeLayer(marker);
+		marker=false;
+	}
+}
+
+
+//Hide the profile page and save profil data to server
+function saveProfile(){
 	document.getElementById('dimmer').style.display     = 'none'; 
 	document.getElementById('profileBox').style.display = 'none';
 	document.getElementById('buttonRow').style.display  = 'block'; 
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "https://nile16.nu:1208/", true);
+	xhr.onreadystatechange = function(){
+
+		if(this.readyState == 4 && this.status == 200) {
+			removeMyMarkerFromMap();
+			console.log(xhr.responseText);
+			var userdata = JSON.parse(xhr.responseText);
+			user.una = userdata.una;
+			user.pic = userdata.pic;
+			user.hea = userdata.hea;
+			user.lev = userdata.lev;
+			userPicDiv.src          = user.pic;
+			userNameDiv.innerText   = user.una;
+//			userHealthDiv.innerText = user.hea;
+//			userLevelDiv.innerText  = user.lev;
+		}
+	}
+	xhr.send(JSON.stringify({com:"usr",acc:user.account,tok:user.token(),una:userNameDiv.innerText}));
+	
+	
 }
 
 function onSignInGoogle(googleUser){
     if (user.account=="facebook") FB.logout();
 	hideLoginBox();
-	//document.getElementById('loginButton').setAttribute( "src", "icons/logout.png" ); 
-	//document.getElementById('loginButton').setAttribute( "title", "Logout" ); 
-	//document.getElementById('loginButton').setAttribute( "onClick", "javascript: logout();" ); 
 	var profile = googleUser.getBasicProfile();
-	//user.id=profile.getId();
-	user.name=profile.getName();
 	//user.token=String(googleUser.getAuthResponse().id_token);
 	user.account="google";
-	//user.image=profile.getImageUrl();
 	console.log("logged in google");
-	startGPS();
-	startPosUpdates();
 	loginServer();
 }
 
@@ -149,20 +172,16 @@ function onSignInFacebook(){
 	FB.getLoginStatus(function(response) {
 		if (response.status=="connected"){
 			hideLoginBox();
-			//document.getElementById('loginButton').setAttribute( "src", "icons/logout.png" ); 
-			//document.getElementById('loginButton').setAttribute( "title", "Logout" ); 
-			//document.getElementById('loginButton').setAttribute( "onClick", "javascript: logout();" );
 			//user.token=String(response.authResponse.accessToken);
 			user.account="facebook";
 			console.log("logged in facebook");
-			startPosUpdates();
 			loginServer();
-			FB.api('/me', function(response) {
-				user.name=response.name;
-				startGPS();
+			//FB.api('/me', function(response) {
+			//	user.name=response.name;
+			//	startGPS();
 			//	user.id=response.id;
 			//	user.image=response.picture;
-			});
+			//});
 		}
 	});
 }
@@ -179,7 +198,7 @@ function logout(){
 	user.id=false;
 	user.picture=false;
 	map.removeLayer(marker);
-	marker=false;
+	removeMyMarkerFromMap();
 	markers.clearLayers();
 	stopPosUpdates();
 	stopGPS();
@@ -213,11 +232,13 @@ function loginServer(){
 			user.lev = userdata.lev;
 			userPicDiv.src          = user.pic;
 			userNameDiv.innerText   = user.una;
-			userHealthDiv.innerText = user.hea;
-			userLevelDiv.innerText  = user.lev;
+//			userHealthDiv.innerText = user.hea;
+//			userLevelDiv.innerText  = user.lev;
+			startGPS();
+			startPosUpdates();
 		}
 	}
-	xhr.send(JSON.stringify({com:"lin",acc:user.account,tok:user.token()}));
+	xhr.send(JSON.stringify({com:"usr",acc:user.account,tok:user.token()}));
 }
 	
 function updatePosition(pos){
@@ -269,9 +290,8 @@ function stopGPS(){
   function position_found(pos) {
 	console.log("posfound");
     if (!marker){
-		var icon = L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" src="icons/0.png"></div><div class="iconName" onclick="event.stopPropagation()">'+user.name+'</div>',iconAnchor:[8, 8]});
+		var icon = L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" src="icons/0.png"></div><div class="iconName" onclick="event.stopPropagation()">'+user.una+'</div>',iconAnchor:[8, 8]});
 		marker = L.marker([pos.coords.latitude, pos.coords.longitude], {draggable:false, icon:icon}).addTo(map);
-		//marker.bindPopup("Du är här!",{offset:[0,-10]});
 		}
 	else{
 		marker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
@@ -281,15 +301,11 @@ function stopGPS(){
   }
 
   function position_not_found() {
-	//console.log("posnotfound");
-    if (marker){
-		map.removeLayer(marker);
-		marker=false;}
+	removeMyMarkerFromMap();
   }
 
   function startPosUpdates(){
 	posUpdates = setInterval(function(){
-	//console.log("posup");
 		if (marker)	updatePosition([parseFloat(marker.getLatLng().lat.toFixed(5)), parseFloat(marker.getLatLng().lng.toFixed(5))]);
 	}, 5000);
   }

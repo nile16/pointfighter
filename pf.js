@@ -59,7 +59,7 @@ https.createServer( serverOptions, (req,res) => {
 			//console.log("Invalid token");
 			res.end(JSON.stringify({err:'Invalid token'}));
 		}
-		else if (postObj.com=="lin"){
+		else if (postObj.com=="usr"){
 			//console.log("Login User:",userInfo);
 			MongoClient.connect(dburl, (err, db) => {
 				db.collection('users').find({acc:postObj.acc,uid:userInfo.id}).toArray((err, docs) => {
@@ -70,17 +70,23 @@ https.createServer( serverOptions, (req,res) => {
 						});
 					}
 					else {
-						db.close();
-						res.end(JSON.stringify({err:false,una:docs[0].una,pic:docs[0].pic,hea:docs[0].hea,lev:docs[0].lev}));
+						var update={};
+						update.$set={};
+						update.$inc={};
+						if (postObj.una) update.$set.una=postObj.una;
+						if (postObj.pic) update.$set.pic=postObj.pic;
+						if (postObj.hea) update.$inc.hea=postObj.hea;
+						if (postObj.lev) update.$inc.lev=postObj.lev;
+						MongoClient.connect(dburl, (err, db) => {
+							//db.collection('users').update({acc:postObj.acc,uid:userInfo.id},{$set:{una:postObj.una}}, (err, r) => { 
+							db.collection('users').update({acc:postObj.acc,uid:userInfo.id}, update, (err, r) => { 
+								db.collection('users').find({acc:postObj.acc,uid:userInfo.id}).toArray((err, docs) => {
+									db.close();
+									res.end(JSON.stringify({err:false,una:docs[0].una,pic:docs[0].pic,hea:docs[0].hea,lev:docs[0].lev}));
+								});
+							});
+						});
 					}
-				});
-			});
-		}
-		else if (postObj.com=="uud"){
-			//console.log("Update User data:",userInfo);
-			MongoClient.connect(dburl, (err, db) => {
-				db.collection('users').update({acc:postObj.acc,uid:userInfo.id},{$set:{una:postObj.una}}, (err, r) => { 
-					res.end(JSON.stringify({err:false}));
 				});
 			});
 		}
