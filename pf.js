@@ -94,7 +94,6 @@ https.createServer( serverOptions, (req,res) => {
 			//console.log("Update User position:",userInfo);
 			MongoClient.connect(dburl, (err, db) => {
 				db.collection('users').update({acc:postObj.acc,uid:userInfo.id},{$set:{pos:postObj.pos,pti:Math.floor(new Date()/1000)}}, (err, r) => { 
-					MongoClient.connect(dburl, (err, db) => {
 						db.collection('users').find( {"$or":[{acc:{"$ne":postObj.acc}},{uid:{"$ne":userInfo.id}}]} ).toArray( (err, docs) => {
 							var users=[];
 							for (i=0;i<docs.length;i++){
@@ -104,7 +103,6 @@ https.createServer( serverOptions, (req,res) => {
 							//console.log(users);
 							db.close();
 						});
-					});
 				});
 			});
 		}
