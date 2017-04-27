@@ -41,15 +41,28 @@ https.createServer( serverOptions, (req,res) => {
 
 	req.on('end', () => {
 
-		postObj=JSON.parse(body);
-		
-		//console.log("postObj",postObj);
-		
-		if ((postObj.acc=="google")&&postObj.tok)   checkGoogleToken(postObj.tok,tokenChecked);
+		try {
+			postObj=JSON.parse(body);
 
-		else if ((postObj.acc=="facebook")&&postObj.tok) checkFacebookToken(postObj.tok,tokenChecked);
+			if (!postObj.tok) res.end(JSON.stringify({err:'tok not specified'}));
+
+			if (!postObj.acc) res.end(JSON.stringify({err:'acc not specified'}));
+
+			if (!postObj.com) res.end(JSON.stringify({err:'com not specified'}));
+			
+			if ((postObj.acc=="google")&&postObj.tok)   checkGoogleToken(postObj.tok,tokenChecked);
+	
+			else if ((postObj.acc=="facebook")&&postObj.tok) checkFacebookToken(postObj.tok,tokenChecked);
+			
+			else res.end(JSON.stringify({err:'Invalid account'}));
+
+		} catch (e) {
+
+			res.end(JSON.stringify({err:'Invalid JSON'}));
+			
+		}
 		
-		else res.end(JSON.stringify({err:'Invalid account'}));
+		
 		
 	});
 	
@@ -64,9 +77,9 @@ https.createServer( serverOptions, (req,res) => {
 			MongoClient.connect(dburl, (err, db) => {
 				db.collection('users').find({acc:postObj.acc,uid:userInfo.id}).toArray((err, docs) => {
 					if (docs.length==0){
-						db.collection('users').insert({acc:postObj.acc,uid:userInfo.id,una:userInfo.name,pic:userInfo.pic,hea:50,lev:0}, (err, r) => { 
+						db.collection('users').insert({acc:postObj.acc,uid:userInfo.id,una:userInfo.name,pic:userInfo.pic,ski:1,hea:100,lev:10,spd:50,ata:50,def:50,adm:false}, (err, r) => { 
 							db.close();
-							res.end(JSON.stringify({err:false,una:userInfo.name,pic:userInfo.pic,hea:50,lev:0}));
+							res.end(JSON.stringify({err:false,una:userInfo.name,pic:userInfo.pic,ski:1,hea:100,lev:10,spd:50,ata:50,def:50}));
 						});
 					}
 					else {
@@ -75,14 +88,18 @@ https.createServer( serverOptions, (req,res) => {
 						update.$inc={};
 						if (postObj.una) update.$set.una=postObj.una;
 						if (postObj.pic) update.$set.pic=postObj.pic;
+						if (postObj.ski) update.$set.ski=postObj.ski;
 						if (postObj.hea) update.$inc.hea=postObj.hea;
 						if (postObj.lev) update.$inc.lev=postObj.lev;
+						if (postObj.spd) update.$inc.spd=postObj.spd;
+						if (postObj.ata) update.$inc.ata=postObj.ata;
+						if (postObj.def) update.$inc.def=postObj.def;
 						MongoClient.connect(dburl, (err, db) => {
 							//db.collection('users').update({acc:postObj.acc,uid:userInfo.id},{$set:{una:postObj.una}}, (err, r) => { 
 							db.collection('users').update({acc:postObj.acc,uid:userInfo.id}, update, (err, r) => { 
 								db.collection('users').find({acc:postObj.acc,uid:userInfo.id}).toArray((err, docs) => {
 									db.close();
-									res.end(JSON.stringify({err:false,una:docs[0].una,pic:docs[0].pic,hea:docs[0].hea,lev:docs[0].lev}));
+									res.end(JSON.stringify({err:false,una:docs[0].una,pic:docs[0].pic,ski:docs[0].ski,hea:docs[0].hea,lev:docs[0].lev,spd:docs[0].spd,ata:docs[0].ata,def:docs[0].def}));
 								});
 							});
 						});
@@ -91,13 +108,15 @@ https.createServer( serverOptions, (req,res) => {
 			});
 		}
 		else if (postObj.com=="pos"){
-			//console.log("Update User position:",userInfo);
+
+			if (!postObj.pos) res.end(JSON.stringify({err:'pos not specified'}));
+
 			MongoClient.connect(dburl, (err, db) => {
 				db.collection('users').update({acc:postObj.acc,uid:userInfo.id},{$set:{pos:postObj.pos,pti:Math.floor(new Date()/1000)}}, (err, r) => { 
 						db.collection('users').find( {"$or":[{acc:{"$ne":postObj.acc}},{uid:{"$ne":userInfo.id}}]} ).toArray( (err, docs) => {
 							var users=[];
 							for (i=0;i<docs.length;i++){
-								if (docs[i].pos&&((docs[i].pti+30)>Math.floor(new Date()/1000))) users.push([docs[i].pos,docs[i].una]);
+								if (docs[i].pos&&((docs[i].pti+30)>Math.floor(new Date()/1000))) users.push([docs[i].pos,docs[i].una,docs[i].pic]);
 							}
 							res.end(JSON.stringify({err:false,ous:users}));
 							//console.log(users);
@@ -119,7 +138,7 @@ https.createServer( serverOptions, (req,res) => {
 function checkGoogleToken(token,cb){
 	client.verifyIdToken(token,googleCI,function(e, login) {
 		if (e){
-			console.log(e);
+			//console.log(e);
 			cb(false);
 			return;
 		}

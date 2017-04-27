@@ -20,9 +20,17 @@
 <body>                                                                            
    <div  id='wrapper' >
 	<div id='dimmer' ></div>
+	<div id='bar1Wrap' >
+		<div id='bar1' ></div>
+		<div id='bar1text' ></div>
+	</div>
+	<div id='bar2Wrap' >
+		<div id='bar2' ></div>
+		<div id='bar2text' ></div>
+	</div>
     <div id='buttonRow' >
 		<div class="button" id='b1' ><IMG id="zoomToUserButton" src="icons/b1.png"  title="Centre map at your position" onclick="zoomToUser();" ></div>
-		<div class="button" id='b2' ><IMG id="loginButton"      src="icons/b2.png"  title="Logout" onclick="logout();" ></div>
+<!--		<div class="button" id='b2' ><IMG id="loginButton"      src="icons/b2.png"  title="Logout" onclick="logout();" ></div> -->
 		<div class="button" id='b3' ><IMG id="profileButton"    src="icons/b3.png"  title="Menu" onclick="showProfileBox();" ></div>
 		<div class="button" id='b4' ><IMG id="mapButton"        src="icons/b4.png"  title="Maps" onclick="showMapMenu();" ></div>
 		<div class="button" id='b5' ><IMG id="fullScreenButton" src="icons/b51.png" title="Request Full Screen" onclick="screenfull.request();" ></div>
@@ -51,11 +59,18 @@
 		<!--<div class="loginButton" onclick="hideLoginBox()">Cancel</div>-->
 	</div>
 	<div id='profileBox' >
-		<br><br>
-		<img id="userPicDiv">
-		<div id="userNameDiv" contenteditable="true"></div>
 		<br>
-		<button onclick="saveProfile();">DONE</button>
+		<img id="userPicDiv"><br>
+		Nick: <div id="userNameDiv" contenteditable="true"></div><br>
+		Health: <div id="userHealthDiv"></div><br>
+		Level: <div id="userLevelDiv"></div><br>
+		Skin: <div id="userSkinDiv" contenteditable="true"></div><br>
+		Speed: <div id="userSpeedDiv"></div><br>
+		Attack: <div id="userAttackDiv"></div><br>
+		Defence: <div id="userDefenceDiv"></div><br>
+		<br>
+		<button onclick="saveProfile();">QUIT and SAVE</button>
+		<button onclick="logout();">LOGOUT</button><br>
 	</div>
 	<div id='message' ></div>
    </div>
@@ -64,8 +79,6 @@
 
 <script>
 
-//		<div id="userHealthDiv"></div>
-//		<div id="userLevelDiv"></div>
 
 
 //Initiate Facebook
@@ -89,12 +102,12 @@ gapi.load('auth2', function() {
 	});
 });
 
-//Start login with Facebook
+//Initiate login with Facebook
 function loginFacebook(){
 	FB.login(onSignInFacebook);
 }
 
-//Start login with Google
+//Initiate login with Google
 function loginGoogle(){
 	gapi.auth2.getAuthInstance().signIn().then(onSignInGoogle);
 }
@@ -103,36 +116,24 @@ function loginGoogle(){
 function showLoginBox(){
     document.getElementById('dimmer').style.display     = 'block'; 
 	document.getElementById('loginBox').style.display   = 'block';
-    document.getElementById('buttonRow').style.display  = 'none'; 
 }
 
 //Hide the login buttons for Google and Facebook
 function hideLoginBox(){
     document.getElementById('dimmer').style.display     = 'none'; 
 	document.getElementById('loginBox').style.display   = 'none';
-	document.getElementById('buttonRow').style.display  = 'block'; 
 }
 
 //Show the profile page
 function showProfileBox(){
 	document.getElementById('dimmer').style.display     = 'block'; 
 	document.getElementById('profileBox').style.display = 'block';
-	document.getElementById('buttonRow').style.display  = 'none'; 
 }
-
-function removeMyMarkerFromMap(){
-	if (marker){
-		map.removeLayer(marker);
-		marker=false;
-	}
-}
-
 
 //Hide the profile page and save profil data to server
 function saveProfile(){
 	document.getElementById('dimmer').style.display     = 'none'; 
 	document.getElementById('profileBox').style.display = 'none';
-	document.getElementById('buttonRow').style.display  = 'block'; 
 
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", "https://nile16.nu:1208/", true);
@@ -144,17 +145,31 @@ function saveProfile(){
 			var userdata = JSON.parse(xhr.responseText);
 			user.una = userdata.una;
 			user.pic = userdata.pic;
+			user.ski = userdata.ski;
 			user.hea = userdata.hea;
 			user.lev = userdata.lev;
+			user.spd = userdata.spd;
+			user.ata = userdata.ata;
+			user.def = userdata.def;
 			userPicDiv.src          = user.pic;
 			userNameDiv.innerText   = user.una;
-//			userHealthDiv.innerText = user.hea;
-//			userLevelDiv.innerText  = user.lev;
+			userSkinDiv.innerText   = user.ski;
 		}
 	}
-	xhr.send(JSON.stringify({com:"usr",acc:user.account,tok:user.token(),una:userNameDiv.innerText}));
-	
-	
+	xhr.send(JSON.stringify({com:"usr",acc:user.account,tok:user.token(),una:userNameDiv.innerText,ski:userSkinDiv.innerText}));
+}
+
+function removeMyMarkerFromMap(){
+	if (marker){
+		map.removeLayer(marker);
+		marker=false;
+	}
+}
+
+function setBar(bar,procent){
+	document.getElementById(bar+'text').innerText = procent+"%";
+	procent = 100 - procent + "%";
+	document.getElementById(bar).style.right = procent;
 }
 
 function onSignInGoogle(googleUser){
@@ -163,7 +178,7 @@ function onSignInGoogle(googleUser){
 	var profile = googleUser.getBasicProfile();
 	//user.token=String(googleUser.getAuthResponse().id_token);
 	user.account="google";
-	console.log("logged in google");
+	//console.log("logged in google");
 	loginServer();
 }
 
@@ -174,7 +189,7 @@ function onSignInFacebook(){
 			hideLoginBox();
 			//user.token=String(response.authResponse.accessToken);
 			user.account="facebook";
-			console.log("logged in facebook");
+			//console.log("logged in facebook");
 			loginServer();
 			//FB.api('/me', function(response) {
 			//	user.name=response.name;
@@ -187,6 +202,7 @@ function onSignInFacebook(){
 }
 
 function logout(){
+	saveProfile();
     if (user.account=="google") gapi.auth2.getAuthInstance().signOut();
     if (user.account=="facebook")FB.logout();
 	showLoginBox();
@@ -197,9 +213,10 @@ function logout(){
 	user.name=false;
 	user.id=false;
 	user.picture=false;
-	map.removeLayer(marker);
 	removeMyMarkerFromMap();
 	markers.clearLayers();
+	setBar('bar1',0);
+	setBar('bar2',0);
 	stopPosUpdates();
 	stopGPS();
 }
@@ -228,14 +245,25 @@ function loginServer(){
 			var userdata = JSON.parse(xhr.responseText);
 			user.una = userdata.una;
 			user.pic = userdata.pic;
+			user.ski = userdata.ski;
+			user.spd = userdata.spd;
+			user.ata = userdata.ata;
+			user.def = userdata.def;
 			user.hea = userdata.hea;
 			user.lev = userdata.lev;
-			userPicDiv.src          = user.pic;
-			userNameDiv.innerText   = user.una;
-//			userHealthDiv.innerText = user.hea;
-//			userLevelDiv.innerText  = user.lev;
+			setBar('bar1',user.hea);
+			setBar('bar2',user.lev);
+			userPicDiv.src           = user.pic;
+			userNameDiv.innerText    = user.una;
+			userHealthDiv.innerText  = user.hea;
+			userLevelDiv.innerText   = user.lev;
+			userSkinDiv.innerText    = user.ski;
+			userSpeedDiv.innerText   = user.spd;
+			userAttackDiv.innerText  = user.ata;
+			userDefenceDiv.innerText = user.def;
 			startGPS();
 			startPosUpdates();
+			//loadPoints();
 		}
 	}
 	xhr.send(JSON.stringify({com:"usr",acc:user.account,tok:user.token()}));
@@ -250,7 +278,7 @@ function updatePosition(pos){
 			var pmarkers = [];
 			other_users = JSON.parse(xhr.responseText).ous;
 			for (i=0;i<other_users.length;i++){
-				var icon = L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" src="icons/3.png"></div><div class="iconName" onclick="event.stopPropagation()">'+other_users[i][1]+'</div>',iconAnchor:[8, 8]});
+				var icon = L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" src="'+other_users[i][2]+'"></div><div class="iconName" onclick="event.stopPropagation()">'+other_users[i][1]+'</div>',iconAnchor:[8, 8]});
 				pmarkers[i] = L.marker(other_users[i][0],{draggable:false, icon:icon}).addTo(map);
 			}
 			markers.clearLayers();
@@ -266,11 +294,7 @@ function updatePosition(pos){
 function startGPS(){
 	posWatch=navigator.geolocation.watchPosition(
 		function(pos){ 
-			//console.log('Your current position is:');
-			//console.log('Latitude : ' + pos.coords.latitude);
-			//console.log('Longitude: ' + pos.coords.longitude);
-			//console.log('More or less ' + pos.coords.accuracy + ' meters.');
-			if (pos.coords.accuracy<50000)
+			if (pos.coords.accuracy<50000) // Change to lower value before launch
 				position_found(pos); 
 			else
 				position_not_found();
@@ -284,13 +308,11 @@ function startGPS(){
 function stopGPS(){
 	navigator.geolocation.clearWatch(posWatch);
 }  
-  
-  
 
   function position_found(pos) {
 	console.log("posfound");
     if (!marker){
-		var icon = L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" src="icons/0.png"></div><div class="iconName" onclick="event.stopPropagation()">'+user.una+'</div>',iconAnchor:[8, 8]});
+		var icon = L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" src="'+user.pic+'"></div><div class="iconName" onclick="event.stopPropagation()">'+user.una+'</div>',iconAnchor:[12, 12]});
 		marker = L.marker([pos.coords.latitude, pos.coords.longitude], {draggable:false, icon:icon}).addTo(map);
 		}
 	else{
@@ -325,16 +347,16 @@ function showMapMenu(){
 }
  
 function setMap(m){
-		map.removeLayer(currentMap); 
-		currentMap=m;
-		map.addLayer(m); 
-		document.getElementById('dimmer').style.display  = 'none'; 
-		document.getElementById('mapBox').style.display  = 'none'; 
+	map.removeLayer(currentMap); 
+	currentMap=m;
+	map.addLayer(m); 
+	document.getElementById('dimmer').style.display  = 'none'; 
+	document.getElementById('mapBox').style.display  = 'none'; 
 }
   
   function showMessage(mess) {
     document.getElementById('dimmer').style.display  = 'block'; 
-    document.getElementById('message').innerHTML = mess; 
+    document.getElementById('message').innerHTML = '<div id="closeMessageButton" onclick="closeMessage()" >x</div>' + mess; 
     document.getElementById('message').style.display = 'block';
   }  
   
@@ -372,7 +394,6 @@ function checkDistances(){
   var osm = new L.TileLayer(osmUrl, {minZoom:1, maxZoom:19});		
  
   // Mapbox layer
-  //L.mapbox.accessToken = 'pk.eyJ1Ijoic2VhcmNob3NtIiwiYSI6ImNpZ21vN2J0NzAwMjJhYWx4Zm95aTk1NW8ifQ.JmAKk8EayQ6cwMDJp-ZwVg';
   var mapbox = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + 'pk.eyJ1Ijoic2VhcmNob3NtIiwiYSI6ImNpZ21vN2J0NzAwMjJhYWx4Zm95aTk1NW8ifQ.JmAKk8EayQ6cwMDJp-ZwVg', {minZoom:1, maxZoom: 18});
 
   // Google Map layer
@@ -387,8 +408,7 @@ function checkDistances(){
 
   
   var map = new L.Map('map', { doubleClickZoom:false, zoomControl:false, maxBounds:([[90,-270],[-90,270]]) });
-  //var zoom = L.control.zoom( { position:'topleft' } ).addTo(map); 
-  //L.control.scale({imperial:false}).addTo(map);
+
   map.attributionControl.setPrefix("");
 
 
@@ -412,8 +432,6 @@ user.token=function (){
   var currentMap=mapbox;
   
   //var markerIcon  = L.icon({iconUrl: "icons/0.png",iconAnchor:[8, 8],});
-  var markerIcon1 = L.icon({iconUrl: "icons/1.png",iconAnchor:[8, 8],});
-  var markerIcon2 = L.icon({iconUrl: "icons/2.png",iconAnchor:[8, 8],});
   var ios     = /(iPad|iPhone|iPod)/g.test(navigator.userAgent);
   var android = /(android)/i.test(navigator.userAgent);
 
@@ -425,33 +443,52 @@ user.token=function (){
   map.fitBounds([[0,-180],[0,180]]);
 
   
-  var track=[
-	[56.15944,15.13235],
-	[56.15909,15.13057],
-	[56.15991,15.12972],
-	[56.16125,15.12998],
-	[56.16195,15.13078],
-	[56.16286,15.13042],
-	[56.16354,15.12897],
-	[56.16420,15.12761],
-	[56.16445,15.12871],
-	[56.16456,15.13089],
-	[56.16456,15.13291],
-	[56.16452,15.13492],
-	[56.16431,15.13745],
-	[56.16272,15.13684],
-	[56.16242,15.13718],
-	[56.16178,15.13657],
-	[56.16050,15.13603],
-	[56.15967,15.13567],
-	[56.15906,15.13473],
-	[56.15909,15.13358],
-	];  
-
-function loadTrack(){
-	hideMenuBox();
-	for (i=0;i<track.length;i++)
-		targets[i]=L.marker(track[i],{draggable:false, icon:markerIcon1}).addTo(map);
+  var pointsList=[
+	[1 ,1,[56.43956,14.61423],"<b>Vita Sten</b><br>Gammal gränssten mellan Sverige och Danmark."],
+	[2 ,2,[56.24739,15.27352],"<b>Luftvärnsbatteri</b><br>"],
+	[3 ,3,[56.15904,15.13374],"<b>Väbynäs Bunker</b><br>Byggdes under andra världskriget."],
+	[4 ,4,[56.15181,14.66973],"<b>Listers Härads Avrättningsplats</b><br>"],
+	[5 ,1,[56.43655,14.57008],"<b>B17 Haveriplats</b><br>Ett Amerikanskt B17-plan gick ner här under andra världskriget."],
+	[6 ,2,[56.46642,14.65185],"<b>Kyrkö Mosse Bilkyrkogård</b><br>"],
+	[7 ,1,[56.32149,16.03863],"<b>Fredsstenen</b><br>Softa och heala dig här."],
+	[8 ,1,[56.22892,14.88335],"<b>Tararps Jättegrytor</b><br>Jättefina jättegrytor!"],
+	[9 ,1,[56.22124,15.10608],"<b>SnittingeFallet</b><br>Bräkne-Hobys stolthet. Softa och heala dig här."],
+	[10,1,[56.22975,15.13352],"<b>Bräkne-Hoby Jättegryta</b><br>Softa och heala dig här."],
+	[11,1,[56.23663,15.27620],"<b>Djupaforsklyftan</b><br>Här rinner Ronnebyån genom en 18 m djup ränna som bara är 1,5 m bred. Branta sluttningar med stora flyttblock och vacker bokskog reser sig över ån. Softa och heala dig här."],
+	[12,1,[56.25340,15.33798],"<b>Anglestue Grotta</b><br>"],
+	[13,1,[56.17114,14.96547],"<b>Hitlersten</b><br>Här höggs granit till Germania. Softa och heala dig här."],
+	[14,2,[56.16467,14.86941],"<b>Utvandrarmonumentet</b><br>"],
+	[15,1,[56.14925,14.84510],"<b>Höga Rör</b><br>Ett fem meter högt gravröse daterat till bronsåldern, benämnt Höga rör, vilket är Blekinges största. Softa och heala dig här."],
+	[16,4,[56.53349,15.60082],"<b>Dackestenen</b><br>"],
+	[17,1,[56.41925,15.68378],"<b>Nils Dackes Forna Hemvist i Flaken</b><br>"],
+	[18,2,[56.48171,15.68788],"<b>Nils Dackes Forna Lindö Gård</b><br>"],
+	[19,3,[56.40302,15.66007],"<b>Platsen för mordet på Nils Dacke</b><br>Kriga mot Gustav Vasas legoknektar!"],
+	[20,4,[56.47071,15.34233],"<b>Railroad memorial May 27 1908</b><br>"],
+	[21,1,[56.40602,15.67169],"<b>Sörsjö-Jons Stuga; Nils Dackes Gömställe</b><br>Softa och heala dig här."],
+	[22,4,[56.42517,15.72576],"<b>Tullstation</b><br>Gammal tullstation vid forna gränsen mellan Sverige och Danmark."],
+	[23,3,[56.07385,15.73029],"<b>U137 Gick på grund här</b><br>Kriga mot Sovjet!"],
+	[24,1,[56.11835,15.83494],"<b>Hällristning Hästhallen</b><br>Hästhallen är Blekinges största hällristning och består av 140 ristningar uppdelade i sju grupper. Motiven utgörs av människor, skepp, hästar och ryttare, hjortdjur, solhjul, fotsulor och skålgropar. Hällristningarna är daterade till bronsåldern, omkring 1000 före Kristus."],
+	[25,1,[56.20273,15.37919],"<b>Björketorps-stenen</b><br>"],
+	[26,1,[56.44135,14.52813],"<b>Rävabacken</b><br>Högsta punkt i Blekinge. Softa och heala dig här."],
+	[27,1,[56.02162,14.18389],"<b>Sveriges lägsta punkt</b><br>"],
+	[28,1,[55.68266,14.23383],"<b>Kungagraven</b><br>Kungagraven, även benämnd Kiviksgraven eller Bredarör, är ett gravröse beläget i Kivik i Södra Mellby socken och Simrishamns kommun. Det är en gravplats från bronsåldern, som under historisk tid både förstörts delvis, plundrats och restaurerats till ett icke ursprungligt skick."]
+	];
+	
+	
+function iconClicked(i){
+	//console.log(distance(marker.getLatLng().lat,marker.getLatLng().lng,pointsList[i][2][0],pointsList[i][2][1]));
+	showMessage(pointsList[i][3]);
+}
+	
+	
+	
+function loadPoints(){
+	for (i=0;i<pointsList.length;i++){
+		if (pointsList[i][1]==1) markers[i]=L.marker(pointsList[i][2],{draggable:false, icon:L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" onclick="iconClicked('+i+')" src="icons/1.png"></div>',iconAnchor:[8, 8]})}).addTo(map);
+		if (pointsList[i][1]==2) markers[i]=L.marker(pointsList[i][2],{draggable:false, icon:L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" onclick="iconClicked('+i+')" src="icons/2.png"></div>',iconAnchor:[8, 8]})}).addTo(map);
+		if (pointsList[i][1]==3) markers[i]=L.marker(pointsList[i][2],{draggable:false, icon:L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" onclick="iconClicked('+i+')" src="icons/3.png"></div>',iconAnchor:[8, 8]})}).addTo(map);
+		if (pointsList[i][1]==4) markers[i]=L.marker(pointsList[i][2],{draggable:false, icon:L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" onclick="iconClicked('+i+')" src="icons/4.png"></div>',iconAnchor:[8, 8]})}).addTo(map);
+	}
 }
 
   </script>                              
