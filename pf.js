@@ -176,9 +176,6 @@ function checkFacebookToken(token,cb){
 }
 
 
-//checkGoogleToken(token,console.log);
-
-//checkFacebookToken('EAAFIFUayZAoQBABx2Glx959I4tbVmnWuqpTy79rtdZAODPLhi4YQck9H0ExCDQcESSaNBaWOwtfF7QYolAHf4ZAyXgqyZCjZCY00eHYztR9Pgb4PJ67D0jWZCPGXAoDZCndKGN39ZBFr5oVfZC2vYZAO06aefEhZCV3vHk9jE4Cnh4eIkL9JchMIb6G88VrctqIUIYZD',console.log);
 
 
 
