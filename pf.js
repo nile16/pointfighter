@@ -42,12 +42,11 @@ https.createServer( serverOptions, (req,res) => {
 	req.on('end', () => {
 
 		try {
+
 			postObj=JSON.parse(body);
 
 			if (!postObj.tok) res.end(JSON.stringify({err:'tok not specified'}));
-
 			if (!postObj.acc) res.end(JSON.stringify({err:'acc not specified'}));
-
 			if (!postObj.com) res.end(JSON.stringify({err:'com not specified'}));
 			
 			if ((postObj.acc=="google")&&postObj.tok)   checkGoogleToken(postObj.tok,tokenChecked);
@@ -69,7 +68,6 @@ https.createServer( serverOptions, (req,res) => {
 	function tokenChecked(userInfo){
 
 		if (!userInfo){
-			//console.log("Invalid token");
 			res.end(JSON.stringify({err:'Invalid token'}));
 		}
 		else if (postObj.com=="usr"){
@@ -94,8 +92,8 @@ https.createServer( serverOptions, (req,res) => {
 						if (postObj.spd) update.$inc.spd=postObj.spd;
 						if (postObj.ata) update.$inc.ata=postObj.ata;
 						if (postObj.def) update.$inc.def=postObj.def;
+
 						MongoClient.connect(dburl, (err, db) => {
-							//db.collection('users').update({acc:postObj.acc,uid:userInfo.id},{$set:{una:postObj.una}}, (err, r) => { 
 							db.collection('users').update({acc:postObj.acc,uid:userInfo.id}, update, (err, r) => { 
 								db.collection('users').find({acc:postObj.acc,uid:userInfo.id}).toArray((err, docs) => {
 									db.close();
@@ -136,6 +134,7 @@ https.createServer( serverOptions, (req,res) => {
 	
 	
 function checkGoogleToken(token,cb){
+
 	client.verifyIdToken(token,googleCI,function(e, login) {
 		if (e){
 			//console.log(e);
@@ -165,13 +164,23 @@ function checkGoogleToken(token,cb){
 }
 
 function checkFacebookToken(token,cb){
+
 	FB.api('me', { fields: ['id', 'name', 'picture'], access_token: token }, function (res) {
-		var data={};
+
+	var data={};
+
 		data.id=res.id;
 		data.name=res.name;
-		if (res.picture) data.pic=res.picture.data.url; else data.pic=false;
-		if (res) cb(data);
-		else cb(false);
+		
+		if (res.picture) 
+			data.pic=res.picture.data.url; 
+		else 
+			data.pic=false;
+		
+		if (res) 
+			cb(data);
+		else 
+			cb(false);
 	});
 }
 
