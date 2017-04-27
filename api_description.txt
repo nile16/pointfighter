@@ -50,7 +50,7 @@ Response:
 {
 	err : false,
 	una : 'Kent Johansson',
-	pic : 'kent.se/mypic.jpg',
+	pic : 'http://kent.se/mypic.jpg',
 	ski : 3,
 	hea : 50,
 	lev : 20,
@@ -67,14 +67,14 @@ Request:
 	tok : 'jhgJyjyKUYfytkFkfUyf.jgLJggygLglluuYuyuyguy',
 	com : 'usr',
 	una : 'Kent Johansson',
-	pic : 'kent.se/mypic.jpg'
+	pic : 'http://kent.se/mypic.jpg'
 }
 
 Response:
 {
 	err : false,
 	una : 'Kent Johansson',
-	pic : 'kent.se/mypic.jpg',
+	pic : 'http://kent.se/mypic.jpg',
 	ski : 3,
 	hea : 47,
 	lev : 24,
@@ -98,7 +98,7 @@ Response:
 {
 	err : false,
 	una : 'Kent Johansson',
-	pic : 'kent.se/mypic.jpg',
+	pic : 'http://kent.se/mypic.jpg',
 	ski : 3,
 	hea : 47,
 	lev : 24,
@@ -137,9 +137,9 @@ Response:
 {
 	err : false,
 	ous : [
-			[[<float> latitude, <float> longitude], <string> user name],
-			[[<float> latitude, <float> longitude], <string> user name],
-			[[<float> latitude, <float> longitude], <string> user name],
+			[[<float> latitude, <float> longitude], <string> user name, <string> user picture url ],
+			[[<float> latitude, <float> longitude], <string> user name, <string> user picture url ],
+			[[<float> latitude, <float> longitude], <string> user name, <string> user picture url ],
 			...,
 			...,
 			...
@@ -162,9 +162,9 @@ Response:
 {
 	err : false,
 	ous : [
-			[[56.16022,15.13355],'Kent Andersson'],
-			[[57.60221,16.33551],'Kurt Andersson'],
-			[[58.02211,17.35522],'Knut Andersson']
+			[[56.16022,15.13355],'Kent Andersson','http://kent.se/mypic.jpg'],
+			[[57.60221,16.33551],'Kurt Andersson','http://kurt.se/mypic.jpg'],
+			[[58.02211,17.35522],'Knut Andersson','http://knut.se/mypic.jpg']
 	]
 }
 
