@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<meta charset='utf-8' />
+<title>Test Game</title>
+</head>                                                                                
+
+
+<body> 
+</body>
+
+<script>
+
+var user = {};
+var urlVars = {};
+
+//Store URL parameters in urlVars
+window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
+	function(m,key,value) {
+		urlVars[key] = value;
+		});
+
+//Request user data from server and call game function when the data is received
+(function getUserData(){
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "https://nile16.nu:1208/", true);
+	xhr.onreadystatechange = function(){
+		if(this.readyState == 4 && this.status == 200) {
+			game(JSON.parse(xhr.responseText));
+		}
+	}
+	xhr.send(JSON.stringify({com:"usr",acc:urlVars.acc,tok:urlVars.tok}));
+
+}());
+
+//Store user data to server when game ends
+function updateUserData(data){
+
+	data.com="usr";
+	data.acc=urlVars.acc;
+	data.tok=urlVars.tok;
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "https://nile16.nu:1208/", true);
+	xhr.onreadystatechange = function(){
+		if(this.readyState == 4 && this.status == 200) {
+			//console.log("Data saved to server.");
+		}
+	}
+	xhr.send(JSON.stringify(data));
+
+};
+
+//Game code goes in this function
+function game(user){
+	
+	console.log(user);
+
+	//Increase level 3 points and decrease health 1 point on server
+	updateUserData({lev:3,hea:-1});
+
+}
+
+</script>
+
+
+
