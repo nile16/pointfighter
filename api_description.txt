@@ -1,36 +1,38 @@
 
 
-All requests and responses are JSON formated. 
+All requests and responses are JSON formated. Only https connections are accepted. 
 
 User Functions.
 
 POST https://nile16.nu:1208/
 Data:
 {
-	acc : <string> account (google or facebook),
-	tok : <string> token provided by google or facebook,
-	com : <string> command, 'usr' for user function
-	una : <string> username (optional),
-	pic : <string> url to picture (optional),
-	ski : <int> Change skin to this number,
-	hea : <signed int> increase health with this value (optional),
-	lev : <signed int> increase level with this value (optional),
-	spd : <signed int> increase speed with this value (optional),
-	ata : <signed int> increase attack level with this value (optional),
-	def : <signed int> increase defence level with this value (optional)
+	"acc" : <string> account (google or facebook),
+	"tok" : <string> token provided by google or facebook,
+	"com" : <string> command, "usr" for user function
+	"una" : <string> username (optional),
+	"pic" : <string> url to picture (optional),
+	"ski" : <int> Change skin to this number (optional),
+	"wea" : <int> Change skin to this number (optional),
+	"hea" : <signed int> increase health with this value (optional),
+	"lev" : <signed int> increase level with this value (optional),
+	"spd" : <signed int> increase speed with this value (optional),
+	"ata" : <signed int> increase attack level with this value (optional),
+	"def" : <signed int> increase defence level with this value (optional)
 }
 
 Response:
 {
-	err : <string> Error, false if no error,
-	una : <string> User name,
-	pic : <string> URL to user's picture,
-	ski : <int> User's skin,
-	hea : <int> User's health,
-	lev : <int> User's level,
-	spd : <int> User's speed,
-	ata : <int> User's attack level,
-	def : <int> User's defence level
+	"err" : <string> Error, false if no error,
+	"una" : <string> User name,
+	"pic" : <string> URL to user"s picture,
+	"ski" : <int> User's skin,
+	"wea" : <int> User's weapon,
+	"hea" : <int> User's health,
+	"lev" : <int> User's level,
+	"spd" : <int> User's speed,
+	"ata" : <int> User's attack level,
+	"def" : <int> User's defence level
 }
 
 
@@ -41,84 +43,87 @@ Fetch user data after login.
 
 Request:
 {
-	acc : 'google',
-	tok : 'jhgJyjyKUYfytkFkfUyf.jgLJggygLglluuYuyuyguy',
-	com : 'usr'
+	"acc" : "google",
+	"tok" : "jhgJyjyKUYfytkFkfUyf.jgLJggygLglluuYuyuyguy",
+	"com" : "usr"
 }
 
 Response:
 {
-	err : false,
-	una : 'Kent Johansson',
-	pic : 'http://kent.se/mypic.jpg',
-	ski : 3,
-	hea : 50,
-	lev : 20,
-	spd : 50,
-	ata : 50,
-	def : 50
+	"err" : false,
+	"una" : "Kent Johansson",
+	"pic" : "http://kent.se/mypic.jpg",
+	"ski" : 3,
+	"wea" : 1,
+	"hea" : 50,
+	"lev" : 20,
+	"spd" : 50,
+	"ata" : 50,
+	"def" : 50
 }
 
 Update user name and/or picture.
 
 Request:
 {
-	acc : 'google',
-	tok : 'jhgJyjyKUYfytkFkfUyf.jgLJggygLglluuYuyuyguy',
-	com : 'usr',
-	una : 'Kent Johansson',
-	pic : 'http://kent.se/mypic.jpg'
+	"acc" : "google",
+	"tok" : "jhgJyjyKUYfytkFkfUyf.jgLJggygLglluuYuyuyguy",
+	"com" : "usr",
+	"una" : "Kent Johansson",
+	"pic" : "http://kent.se/mypic.jpg"
 }
 
 Response:
 {
-	err : false,
-	una : 'Kent Johansson',
-	pic : 'http://kent.se/mypic.jpg',
-	ski : 3,
-	hea : 47,
-	lev : 24,
-	spd : 50,
-	ata : 50,
-	def : 50
+	"err" : false,
+	"una" : "Kent Johansson",
+	"pic" : "http://kent.se/mypic.jpg",
+	"ski" : 3,
+	"wea" : 1,
+	"hea" : 47,
+	"lev" : 24,
+	"spd" : 50,
+	"ata" : 50,
+	"def" : 50
 }
 
 Update user score.
 
 Request:
 {
-	acc : 'google',
-	tok : 'jhgJyjyKUYfytkFkfUyf.jgLJggygLglluuYuyuyguy',
-	com : 'usr',
-	hea : -3,
-	lev : 4
+	"acc" : "google",
+	"tok" : "jhgJyjyKUYfytkFkfUyf.jgLJggygLglluuYuyuyguy",
+	"com" : "usr",
+	"hea" : -3,
+	"lev" : 4
 }
 
 Response:
 {
-	err : false,
-	una : 'Kent Johansson',
-	pic : 'http://kent.se/mypic.jpg',
-	ski : 3,
-	hea : 47,
-	lev : 24,
-	spd : 50,
-	ata : 50,
-	def : 50
+	"err" : false,
+	"una" : "Kent Johansson",
+	"pic" : "http://kent.se/mypic.jpg",
+	"ski" : 3,
+	"wea" : 1,
+	"hea" : 47,
+	"lev" : 24,
+	"spd" : 50,
+	"ata" : 50,
+	"def" : 50
 }
 
 Expired token.
 
 Request:
 {
-	acc : 'google',
-	tok : 'bad.token',
-	com : 'usr',
+	"acc" : "google",
+	"tok" : "bad.token",
+	"com" : "usr",
 }
 
 Response:
 {
-	err : 'Invalid token'
+	"err" : "Invalid token"
 }
 
 
@@ -127,23 +132,23 @@ Positions function.
 POST https://nile16.nu:1208/
 Data:
 {
-	acc : <string> account (google or facebook),
-	tok : <string> token provided by google or facebook,
-	com : <string> command, 'pos' for positions,
-	pos : <array> client's position
+	"acc" : <string> account (google or facebook),
+	"tok" : <string> token provided by google or facebook,
+	"com" : <string> command, "pos" for positions,
+	"pos" : <array> client"s position
 }
 
 Response:
 {
-	err : false,
-	ous : [
+	"err" : false,
+	"ous" : [
 			[[<float> latitude, <float> longitude], <string> user name, <string> user picture url ],
 			[[<float> latitude, <float> longitude], <string> user name, <string> user picture url ],
 			[[<float> latitude, <float> longitude], <string> user name, <string> user picture url ],
 			...,
 			...,
 			...
-		]
+			]
 }
 
 
@@ -152,20 +157,20 @@ Example:
 
 Request:
 {
-	acc : 'google',
-	tok : 'jhgJyjyKUYfytkFkfUyf.jgLJggygLglluuYuyuyguy',
-	com : 'pos',
-	pos : [56.78901,12.23456]
+	"acc" : "google",
+	"tok" : "jhgJyjyKUYfytkFkfUyf.jgLJggygLglluuYuyuyguy",
+	"com" : "pos",
+	"pos" : [56.78901,12.23456]
 }
 
 Response:
 {
-	err : false,
-	ous : [
-			[[56.16022,15.13355],'Kent Andersson','http://kent.se/mypic.jpg'],
-			[[57.60221,16.33551],'Kurt Andersson','http://kurt.se/mypic.jpg'],
-			[[58.02211,17.35522],'Knut Andersson','http://knut.se/mypic.jpg']
-	]
+	"err" : false,
+	"ous" : [
+			[[56.16022,15.13355],"Kent Andersson","http://kent.se/mypic.jpg"],
+			[[57.60221,16.33551],"Kurt Andersson","http://kurt.se/mypic.jpg"],
+			[[58.02211,17.35522],"Knut Andersson","http://knut.se/mypic.jpg"]
+			]
 }
 
 
