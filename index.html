@@ -13,12 +13,13 @@
 <script src="screenfull.js"></script>
 <script src="https://apis.google.com/js/platform.js" ></script>
 <script src="//connect.facebook.net/en_US/sdk.js" id="facebook-jssdk" ></script>
-
 </head>                                                                                
                                                                                   
                                                                                   
 <body>                                                                            
    <div  id='wrapper' >
+    <iframe id="gameFrame" src=""></iframe>
+	<div id="closeGameFrame" onclick="closeGame()"><img src="icons/close.png"></div>
 	<div id='dimmer' ></div>
 	<div id='bar1Wrap' >
 		<div id='bar1' ></div>
@@ -65,6 +66,7 @@
 		Health: <div id="userHealthDiv"></div><br>
 		Level: <div id="userLevelDiv"></div><br>
 		Skin: <div id="userSkinDiv" contenteditable="true"></div><br>
+		Weapon: <div id="userWeaponDiv"></div><br>
 		Speed: <div id="userSpeedDiv"></div><br>
 		Attack: <div id="userAttackDiv"></div><br>
 		Defence: <div id="userDefenceDiv"></div><br>
@@ -142,21 +144,10 @@ function saveProfile(){
 		if(this.readyState == 4 && this.status == 200) {
 			removeMyMarkerFromMap();
 			console.log(xhr.responseText);
-			var userdata = JSON.parse(xhr.responseText);
-			user.una = userdata.una;
-			user.pic = userdata.pic;
-			user.ski = userdata.ski;
-			user.hea = userdata.hea;
-			user.lev = userdata.lev;
-			user.spd = userdata.spd;
-			user.ata = userdata.ata;
-			user.def = userdata.def;
-			userPicDiv.src          = user.pic;
-			userNameDiv.innerText   = user.una;
-			userSkinDiv.innerText   = user.ski;
+			updateUserProfile(JSON.parse(xhr.responseText));
 		}
 	}
-	xhr.send(JSON.stringify({com:"usr",acc:user.account,tok:user.token(),una:userNameDiv.innerText,ski:userSkinDiv.innerText}));
+	xhr.send(JSON.stringify({com:"usr",acc:user.acc,tok:user.tok(),una:userNameDiv.innerText,ski:userSkinDiv.innerText}));
 }
 
 function removeMyMarkerFromMap(){
@@ -173,22 +164,21 @@ function setBar(bar,procent){
 }
 
 function onSignInGoogle(googleUser){
-    if (user.account=="facebook") FB.logout();
+    if (user.acc=="facebook") FB.logout();
 	hideLoginBox();
 	var profile = googleUser.getBasicProfile();
 	//user.token=String(googleUser.getAuthResponse().id_token);
-	user.account="google";
+	user.acc="google";
 	//console.log("logged in google");
 	loginServer();
 }
 
 function onSignInFacebook(){
-    if (user.account=="google") gapi.auth2.getAuthInstance().signOut();
+    if (user.acc=="google") gapi.auth2.getAuthInstance().signOut();
 	FB.getLoginStatus(function(response) {
 		if (response.status=="connected"){
 			hideLoginBox();
-			//user.token=String(response.authResponse.accessToken);
-			user.account="facebook";
+			user.acc="facebook";
 			//console.log("logged in facebook");
 			loginServer();
 			//FB.api('/me', function(response) {
@@ -203,21 +193,26 @@ function onSignInFacebook(){
 
 function logout(){
 	saveProfile();
-    if (user.account=="google") gapi.auth2.getAuthInstance().signOut();
-    if (user.account=="facebook")FB.logout();
+    if (user.acc=="google") gapi.auth2.getAuthInstance().signOut();
+    if (user.acc=="facebook")FB.logout();
 	showLoginBox();
-	//document.getElementById('loginButton').setAttribute( "src", "icons/login.png" ); 
-	//document.getElementById('loginButton').setAttribute( "title", "Login" ); 
-	//document.getElementById('loginButton').setAttribute( "onClick", "javascript: showLoginBox();" );
-	user.account=false;
-	user.name=false;
-	user.id=false;
-	user.picture=false;
+	user.acc = false;
+	user.una = false;
+	user.uid = false;
+	user.pic = false;
+	user.ski = false;
+	user.wea = false;
+	user.spd = false;
+	user.ata = false;
+	user.def = false;
+	user.hea = false;
+	user.lev = false;
 	removeMyMarkerFromMap();
 	markers.clearLayers();
 	setBar('bar1',0);
 	setBar('bar2',0);
 	stopPosUpdates();
+	stopHealingChecks();
 	stopGPS();
 }
 
@@ -242,32 +237,40 @@ function loginServer(){
 
 		if(this.readyState == 4 && this.status == 200) {
 			console.log(xhr.responseText);
-			var userdata = JSON.parse(xhr.responseText);
-			user.una = userdata.una;
-			user.pic = userdata.pic;
-			user.ski = userdata.ski;
-			user.spd = userdata.spd;
-			user.ata = userdata.ata;
-			user.def = userdata.def;
-			user.hea = userdata.hea;
-			user.lev = userdata.lev;
-			setBar('bar1',user.hea);
-			setBar('bar2',user.lev);
-			userPicDiv.src           = user.pic;
-			userNameDiv.innerText    = user.una;
-			userHealthDiv.innerText  = user.hea;
-			userLevelDiv.innerText   = user.lev;
-			userSkinDiv.innerText    = user.ski;
-			userSpeedDiv.innerText   = user.spd;
-			userAttackDiv.innerText  = user.ata;
-			userDefenceDiv.innerText = user.def;
+			updateUserProfile(JSON.parse(xhr.responseText));
 			startGPS();
 			startPosUpdates();
-			//loadPoints();
+			loadPoints();
+			startHealingChecks();
 		}
 	}
-	xhr.send(JSON.stringify({com:"usr",acc:user.account,tok:user.token()}));
+	xhr.send(JSON.stringify({com:"usr",acc:user.acc,tok:user.tok()}));
 }
+
+function updateUserProfile(data){
+	user.una = data.una;
+	user.pic = data.pic;
+	user.ski = data.ski;
+	user.wea = data.wea;
+	user.spd = data.spd;
+	user.ata = data.ata;
+	user.def = data.def;
+	user.hea = data.hea;
+	user.lev = data.lev;
+	setBar('bar1',user.hea);
+	setBar('bar2',user.lev);
+	userPicDiv.src           = user.pic;
+	userNameDiv.innerText    = user.una;
+	userHealthDiv.innerText  = user.hea;
+	userLevelDiv.innerText   = user.lev;
+	userSkinDiv.innerText    = user.ski;
+	userWeaponDiv.innerText  = user.wea;
+	userSpeedDiv.innerText   = user.spd;
+	userAttackDiv.innerText  = user.ata;
+	userDefenceDiv.innerText = user.def;
+}
+
+
 	
 function updatePosition(pos){
 	var xhr = new XMLHttpRequest();
@@ -286,7 +289,7 @@ function updatePosition(pos){
 			markers.addTo(map);
 		}
 	}
-	xhr.send(JSON.stringify({com:"pos",acc:user.account,tok:user.token(),pos:pos}));
+	xhr.send(JSON.stringify({com:"pos",acc:user.acc,tok:user.tok(),pos:pos}));
 }
 
 
@@ -326,16 +329,29 @@ function stopGPS(){
 	removeMyMarkerFromMap();
   }
 
-  function startPosUpdates(){
+function startPosUpdates(){
 	posUpdates = setInterval(function(){
-		if (marker)	updatePosition([parseFloat(marker.getLatLng().lat.toFixed(5)), parseFloat(marker.getLatLng().lng.toFixed(5))]);
+		if (marker){
+			updatePosition([parseFloat(marker.getLatLng().lat.toFixed(5)), parseFloat(marker.getLatLng().lng.toFixed(5))]);
+		}
 	}, 5000);
-  }
+}
 
-  function stopPosUpdates(){
+function stopPosUpdates(){
 	clearInterval(posUpdates);
-  }
-  
+}
+
+function startHealingChecks(){
+	healingChecks = setInterval(function(){
+		if (marker){
+			checkForHealing();
+		}
+	}, 30000);
+}
+
+function stopHealingChecks(){
+	clearInterval(healingChecks);
+}
   
 function zoomToUser(){
 	if (marker) map.setView(marker.getLatLng(), 16);
@@ -380,12 +396,67 @@ function distance(lat1, lon1, lat2, lon2) {
 function checkDistances(){
 	var lat = marker.getLatLng().lat;
 	var lng = marker.getLatLng().lng;
-	for (i=0;i<targets.length;i++){
+	for (i=0;i<markers.length;i++){
 		if (distance(lat,lng,targets[i].getLatLng().lat,targets[i].getLatLng().lng)<10){
 			targets[i].setIcon(markerIcon2);
 		}
 	}
 }
+
+function checkForHealing(){
+	var lat = marker.getLatLng().lat;
+	var lng = marker.getLatLng().lng;
+	for (i=0;i<pointsList.length;i++){
+		if ((pointsList[i][1]==1)&&(distance(lat,lng,pointsList[i][2][0],pointsList[i][2][1])<50)){
+			user.hea=user.hea+1;
+			setBar('bar1',user.hea);
+			break;
+		}
+	}
+}
+
+
+function startGame(g) {
+	gameFrame.style.display = "block";
+	closeGameFrame.style.display = "block";
+    document.getElementById('gameFrame').src = "https://nile16.nu/pf/game"+g+".html?acc="+user.acc+"&tok="+user.tok();
+	closeMessage();
+}
+
+function closeGame(){
+	gameFrame.style.display = "none";
+	closeGameFrame.style.display = "none";
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "https://nile16.nu:1208", true);
+	xhr.onreadystatechange = function(){
+		if(this.readyState == 4 && this.status == 200) {
+			updateUserProfile(JSON.parse(xhr.responseText));
+		}
+	}
+	xhr.send(JSON.stringify({com:"usr",acc:user.acc,tok:user.tok()}));
+}
+
+function loadPoints(){
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "https://nile16.nu:1208/", true);
+	xhr.onreadystatechange = function(){
+		if(this.readyState == 4 && this.status == 200) {
+			pointsList = JSON.parse(xhr.responseText).poi;
+			for (i=0;i<pointsList.length;i++){
+				markers[i]=L.marker([pointsList[i].lat,pointsList[i].lon],{draggable:false, icon:L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" onclick="markerClicked('+i+')" src="icons/'+pointsList[i].typ+'.png"></div>',iconAnchor:[8, 8]})}).addTo(map);
+			}
+		console.log(pointsList);
+		}
+	}
+	xhr.send(JSON.stringify({com:"poi",acc:user.acc,tok:user.tok()}));
+}
+
+function markerClicked(m){
+	var mess = pointsList[m].txt;
+	if (pointsList[m].gam) mess += '<br><button onclick="startGame('+pointsList[m].gam+')" >Play</button>';
+	showMessage(mess);
+}
+
 
 
   // OSM layer
@@ -394,11 +465,14 @@ function checkDistances(){
   var osm = new L.TileLayer(osmUrl, {minZoom:1, maxZoom:19});		
  
   // Mapbox layer
-  var mapbox = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + 'pk.eyJ1Ijoic2VhcmNob3NtIiwiYSI6ImNpZ21vN2J0NzAwMjJhYWx4Zm95aTk1NW8ifQ.JmAKk8EayQ6cwMDJp-ZwVg', {minZoom:1, maxZoom: 18});
+  var mapbox = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2VhcmNob3NtIiwiYSI6ImNpZ21vN2J0NzAwMjJhYWx4Zm95aTk1NW8ifQ.JmAKk8EayQ6cwMDJp-ZwVg', {minZoom:1, maxZoom: 18});
+  //var mapbox = L.tileLayer('https://api.mapbox.com/styles/v1/searchosm/cj22dg5am006d2skh307zj406/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic2VhcmNob3NtIiwiYSI6ImNpZ21vN2J0NzAwMjJhYWx4Zm95aTk1NW8ifQ.JmAKk8EayQ6cwMDJp-ZwVg', { tileSize: 512, zoomOffset: -1 });
 
   // Google Map layer
   var googleAttrib='<a href="http://www.google.com/maps" target="_blank">GoogleMaps</a>';
   var googleStreets = new L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{minZoom:1, maxZoom: 19, subdomains:['mt0','mt1','mt2','mt3']});
+
+  new L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/emerald-v8/tiles/{z}/{x}/{y}?access_token=<your token>', { tileSize: 512, zoomOffset: -1, attribution: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'});
 
   // Google terrain layer
   var googleTerrain = new L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{minZoom:1, maxZoom: 19, subdomains:['mt0','mt1','mt2','mt3']});
@@ -412,19 +486,20 @@ function checkDistances(){
   map.attributionControl.setPrefix("");
 
 
-var user={};
+  var user={};
+  
+  var posUpdates;
+  var healingChecks;
+  var posWatch;
+  var pointsList=[];
+  
+  user.tok=function (){
+      if (user.acc=="google")	return gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+      if (user.acc=="facebook")	return FB.getAuthResponse().accessToken;
+  	return false;
+  }
 
-var posUpdates;
-var posWatch;
 
-user.token=function (){
-    if (user.account=="google")		return gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
-    if (user.account=="facebook")	return FB.getAuthResponse().accessToken;
-	return false;
-}
-
-
-  var targets=[];
   var marker = false;
   var markers = L.featureGroup();
   
@@ -442,54 +517,8 @@ user.token=function (){
   // map.addLayer(markers);
   map.fitBounds([[0,-180],[0,180]]);
 
-  
-  var pointsList=[
-	[1 ,1,[56.43956,14.61423],"<b>Vita Sten</b><br>Gammal gränssten mellan Sverige och Danmark."],
-	[2 ,2,[56.24739,15.27352],"<b>Luftvärnsbatteri</b><br>"],
-	[3 ,3,[56.15904,15.13374],"<b>Väbynäs Bunker</b><br>Byggdes under andra världskriget."],
-	[4 ,4,[56.15181,14.66973],"<b>Listers Härads Avrättningsplats</b><br>"],
-	[5 ,1,[56.43655,14.57008],"<b>B17 Haveriplats</b><br>Ett Amerikanskt B17-plan gick ner här under andra världskriget."],
-	[6 ,2,[56.46642,14.65185],"<b>Kyrkö Mosse Bilkyrkogård</b><br>"],
-	[7 ,1,[56.32149,16.03863],"<b>Fredsstenen</b><br>Softa och heala dig här."],
-	[8 ,1,[56.22892,14.88335],"<b>Tararps Jättegrytor</b><br>Jättefina jättegrytor!"],
-	[9 ,1,[56.22124,15.10608],"<b>SnittingeFallet</b><br>Bräkne-Hobys stolthet. Softa och heala dig här."],
-	[10,1,[56.22975,15.13352],"<b>Bräkne-Hoby Jättegryta</b><br>Softa och heala dig här."],
-	[11,1,[56.23663,15.27620],"<b>Djupaforsklyftan</b><br>Här rinner Ronnebyån genom en 18 m djup ränna som bara är 1,5 m bred. Branta sluttningar med stora flyttblock och vacker bokskog reser sig över ån. Softa och heala dig här."],
-	[12,1,[56.25340,15.33798],"<b>Anglestue Grotta</b><br>"],
-	[13,1,[56.17114,14.96547],"<b>Hitlersten</b><br>Här höggs granit till Germania. Softa och heala dig här."],
-	[14,2,[56.16467,14.86941],"<b>Utvandrarmonumentet</b><br>"],
-	[15,1,[56.14925,14.84510],"<b>Höga Rör</b><br>Ett fem meter högt gravröse daterat till bronsåldern, benämnt Höga rör, vilket är Blekinges största. Softa och heala dig här."],
-	[16,4,[56.53349,15.60082],"<b>Dackestenen</b><br>"],
-	[17,1,[56.41925,15.68378],"<b>Nils Dackes Forna Hemvist i Flaken</b><br>"],
-	[18,2,[56.48171,15.68788],"<b>Nils Dackes Forna Lindö Gård</b><br>"],
-	[19,3,[56.40302,15.66007],"<b>Platsen för mordet på Nils Dacke</b><br>Kriga mot Gustav Vasas legoknektar!"],
-	[20,4,[56.47071,15.34233],"<b>Railroad memorial May 27 1908</b><br>"],
-	[21,1,[56.40602,15.67169],"<b>Sörsjö-Jons Stuga; Nils Dackes Gömställe</b><br>Softa och heala dig här."],
-	[22,4,[56.42517,15.72576],"<b>Tullstation</b><br>Gammal tullstation vid forna gränsen mellan Sverige och Danmark."],
-	[23,3,[56.07385,15.73029],"<b>U137 Gick på grund här</b><br>Kriga mot Sovjet!"],
-	[24,1,[56.11835,15.83494],"<b>Hällristning Hästhallen</b><br>Hästhallen är Blekinges största hällristning och består av 140 ristningar uppdelade i sju grupper. Motiven utgörs av människor, skepp, hästar och ryttare, hjortdjur, solhjul, fotsulor och skålgropar. Hällristningarna är daterade till bronsåldern, omkring 1000 före Kristus."],
-	[25,1,[56.20273,15.37919],"<b>Björketorps-stenen</b><br>"],
-	[26,1,[56.44135,14.52813],"<b>Rävabacken</b><br>Högsta punkt i Blekinge. Softa och heala dig här."],
-	[27,1,[56.02162,14.18389],"<b>Sveriges lägsta punkt</b><br>"],
-	[28,1,[55.68266,14.23383],"<b>Kungagraven</b><br>Kungagraven, även benämnd Kiviksgraven eller Bredarör, är ett gravröse beläget i Kivik i Södra Mellby socken och Simrishamns kommun. Det är en gravplats från bronsåldern, som under historisk tid både förstörts delvis, plundrats och restaurerats till ett icke ursprungligt skick."]
-	];
 	
 	
-function iconClicked(i){
-	//console.log(distance(marker.getLatLng().lat,marker.getLatLng().lng,pointsList[i][2][0],pointsList[i][2][1]));
-	showMessage(pointsList[i][3]);
-}
-	
-	
-	
-function loadPoints(){
-	for (i=0;i<pointsList.length;i++){
-		if (pointsList[i][1]==1) markers[i]=L.marker(pointsList[i][2],{draggable:false, icon:L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" onclick="iconClicked('+i+')" src="icons/1.png"></div>',iconAnchor:[8, 8]})}).addTo(map);
-		if (pointsList[i][1]==2) markers[i]=L.marker(pointsList[i][2],{draggable:false, icon:L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" onclick="iconClicked('+i+')" src="icons/2.png"></div>',iconAnchor:[8, 8]})}).addTo(map);
-		if (pointsList[i][1]==3) markers[i]=L.marker(pointsList[i][2],{draggable:false, icon:L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" onclick="iconClicked('+i+')" src="icons/3.png"></div>',iconAnchor:[8, 8]})}).addTo(map);
-		if (pointsList[i][1]==4) markers[i]=L.marker(pointsList[i][2],{draggable:false, icon:L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" onclick="iconClicked('+i+')" src="icons/4.png"></div>',iconAnchor:[8, 8]})}).addTo(map);
-	}
-}
 
   </script>                              
 

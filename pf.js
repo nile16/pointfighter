@@ -53,6 +53,8 @@ https.createServer( serverOptions, (req,res) => {
 	
 			else if ((postObj.acc=="facebook")&&postObj.tok) checkFacebookToken(postObj.tok,tokenChecked);
 			
+			else if ((postObj.acc=="test")&&postObj.tok) tokenChecked({id:123456789,name:"Kurt Olsson",pic:"http://nile16.nu/pf/logo.png"});
+
 			else res.end(JSON.stringify({err:'Invalid account'}));
 
 		} catch (e) {
@@ -75,9 +77,9 @@ https.createServer( serverOptions, (req,res) => {
 			MongoClient.connect(dburl, (err, db) => {
 				db.collection('users').find({acc:postObj.acc,uid:userInfo.id}).toArray((err, docs) => {
 					if (docs.length==0){
-						db.collection('users').insert({acc:postObj.acc,uid:userInfo.id,una:userInfo.name,pic:userInfo.pic,ski:1,hea:100,lev:10,spd:50,ata:50,def:50,adm:false}, (err, r) => { 
+						db.collection('users').insert({acc:postObj.acc,uid:userInfo.id,una:userInfo.name,pic:userInfo.pic,ski:1,wea:1,sou:1,hea:0,lev:0,spd:50,ata:50,def:50,adm:false}, (err, r) => { 
 							db.close();
-							res.end(JSON.stringify({err:false,una:userInfo.name,pic:userInfo.pic,ski:1,hea:100,lev:10,spd:50,ata:50,def:50}));
+							res.end(JSON.stringify({err:false,una:userInfo.name,pic:userInfo.pic,ski:1,wea:1,sou:1,hea:0,lev:0,spd:50,ata:50,def:50}));
 						});
 					}
 					else {
@@ -87,6 +89,8 @@ https.createServer( serverOptions, (req,res) => {
 						if (postObj.una) update.$set.una=postObj.una;
 						if (postObj.pic) update.$set.pic=postObj.pic;
 						if (postObj.ski) update.$set.ski=postObj.ski;
+						if (postObj.wea) update.$set.wea=postObj.wea;
+						if (postObj.sou) update.$set.sou=postObj.sou;
 						if (postObj.hea) update.$inc.hea=postObj.hea;
 						if (postObj.lev) update.$inc.lev=postObj.lev;
 						if (postObj.spd) update.$inc.spd=postObj.spd;
@@ -97,7 +101,7 @@ https.createServer( serverOptions, (req,res) => {
 							db.collection('users').update({acc:postObj.acc,uid:userInfo.id}, update, (err, r) => { 
 								db.collection('users').find({acc:postObj.acc,uid:userInfo.id}).toArray((err, docs) => {
 									db.close();
-									res.end(JSON.stringify({err:false,una:docs[0].una,pic:docs[0].pic,ski:docs[0].ski,hea:docs[0].hea,lev:docs[0].lev,spd:docs[0].spd,ata:docs[0].ata,def:docs[0].def}));
+									res.end(JSON.stringify({err:false,una:docs[0].una,pic:docs[0].pic,ski:docs[0].ski,wea:docs[0].wea,hea:docs[0].hea,lev:docs[0].lev,spd:docs[0].spd,ata:docs[0].ata,def:docs[0].def}));
 								});
 							});
 						});
@@ -120,6 +124,20 @@ https.createServer( serverOptions, (req,res) => {
 							//console.log(users);
 							db.close();
 						});
+				});
+			});
+		}
+		else if (postObj.com=="poi"){
+
+			MongoClient.connect(dburl, (err, db) => {
+				db.collection('points').find().toArray( (err, docs) => {
+					var points=[];
+					for (i=0;i<docs.length;i++){
+						points.push( { "pid":docs[i].pid,"typ":docs[i].typ,"lat":docs[i].lat,"lon":docs[i].lon,"txt":docs[i].txt,"gam":docs[i].gam } );
+					}
+					res.end(JSON.stringify({err:false,poi:points}));
+					//console.log(points);
+					db.close();
 				});
 			});
 		}
@@ -184,8 +202,26 @@ function checkFacebookToken(token,cb){
 	});
 }
 
-
-
-
+// MongoDB crashes when using update({hea : {$lt : 100}}
+//function incHealthForAllUsers(){
+//	MongoClient.connect(dburl, (err, db) => {
+//		db.collection('users').update({hea : {$lt : 100}}, {$inc : {hea : 1}}, { multi: true });
+//		console.log("Health inc");
+//	});
+//	makeIncInterval();
+//}
+//
+//function makeIncInterval(){
+//    var d = new Date();
+//    var min = d.getMinutes();
+//    var sec = d.getSeconds();
+//
+//    if((min == '00') && (sec == '00'))
+//        incHealthForAllUsers();
+//    else
+//        setTimeout(incHealthForAllUsers,(60*(60-min)+(60-sec))*1000);
+//}
+//
+//makeIncInterval();
 
 

@@ -175,3 +175,23 @@ Response:
 
 
 
+Points function.
+
+POST https://nile16.nu:1208/
+Data:
+{
+	"acc" : <string> account (google or facebook),
+	"tok" : <string> token provided by google or facebook,
+	"com" : "poi"
+}
+
+Response:
+{
+	"err" : false,
+	"poi" : [
+			[ { "pid":<int> point id, "typ":<int> point type, "lat":<float> latitude, "lon":<float> longitude], "txt":<string> text } ],
+			...,
+			...,
+			...
+			]
+}
