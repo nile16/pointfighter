@@ -128,26 +128,16 @@ function hideLoginBox(){
 
 //Show the profile page
 function showProfileBox(){
-	document.getElementById('dimmer').style.display     = 'block'; 
+	//document.getElementById('dimmer').style.display     = 'block'; 
 	document.getElementById('profileBox').style.display = 'block';
 }
 
 //Hide the profile page and save profil data to server
 function saveProfile(){
-	document.getElementById('dimmer').style.display     = 'none'; 
 	document.getElementById('profileBox').style.display = 'none';
-
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST", "https://nile16.nu:1208/", true);
-	xhr.onreadystatechange = function(){
-
-		if(this.readyState == 4 && this.status == 200) {
-			removeMyMarkerFromMap();
-			console.log(xhr.responseText);
-			updateUserProfile(JSON.parse(xhr.responseText));
-		}
-	}
-	xhr.send(JSON.stringify({com:"usr",acc:user.acc,tok:user.tok(),una:userNameDiv.innerText,ski:userSkinDiv.innerText}));
+	removeMyMarkerFromMap();
+	user.una=userNameDiv.innerText;
+	updateUserDataToServer();
 }
 
 function removeMyMarkerFromMap(){
@@ -158,7 +148,10 @@ function removeMyMarkerFromMap(){
 }
 
 function setBar(bar,procent){
-	document.getElementById(bar+'text').innerText = procent+"%";
+	var text;
+	if ((bar=="bar1")||((bar=="bar1p"))) text = "Health: "+procent+"%"
+	if ((bar=="bar2")||((bar=="bar2p"))) text = "Level:  "+procent+"%"
+	document.getElementById(bar+'text').innerText = text;
 	procent = 100 - procent + "%";
 	document.getElementById(bar).style.right = procent;
 }
@@ -167,10 +160,8 @@ function onSignInGoogle(googleUser){
     if (user.acc=="facebook") FB.logout();
 	hideLoginBox();
 	var profile = googleUser.getBasicProfile();
-	//user.token=String(googleUser.getAuthResponse().id_token);
 	user.acc="google";
-	//console.log("logged in google");
-	loginServer();
+	loggedIn();
 }
 
 function onSignInFacebook(){
@@ -179,14 +170,7 @@ function onSignInFacebook(){
 		if (response.status=="connected"){
 			hideLoginBox();
 			user.acc="facebook";
-			//console.log("logged in facebook");
-			loginServer();
-			//FB.api('/me', function(response) {
-			//	user.name=response.name;
-			//	startGPS();
-			//	user.id=response.id;
-			//	user.image=response.picture;
-			//});
+			loggedIn();
 		}
 	});
 }
@@ -230,14 +214,18 @@ function logout(){
 	  } );
 	}
 
-function loginServer(){
+	
+function loggedIn(){
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", "https://nile16.nu:1208", true);
 	xhr.onreadystatechange = function(){
 
 		if(this.readyState == 4 && this.status == 200) {
-			console.log(xhr.responseText);
-			updateUserProfile(JSON.parse(xhr.responseText));
+			var data = JSON.parse(xhr.responseText);
+			if (!data.err){
+				for (var attrname in data) user[attrname] = data[attrname]; 
+				updateUserDataProfile()
+				}
 			startGPS();
 			startPosUpdates();
 			loadPoints();
@@ -247,16 +235,7 @@ function loginServer(){
 	xhr.send(JSON.stringify({com:"usr",acc:user.acc,tok:user.tok()}));
 }
 
-function updateUserProfile(data){
-	user.una = data.una;
-	user.pic = data.pic;
-	user.ski = data.ski;
-	user.wea = data.wea;
-	user.spd = data.spd;
-	user.ata = data.ata;
-	user.def = data.def;
-	user.hea = data.hea;
-	user.lev = data.lev;
+function updateUserDataProfile(){
 	setBar('bar1',user.hea);
 	setBar('bar2',user.lev);
 	userPicDiv.src           = user.pic;
@@ -270,7 +249,18 @@ function updateUserProfile(data){
 	userDefenceDiv.innerText = user.def;
 }
 
-
+function updateUserDataToServer(){
+	var data = Object.create(user);
+	data.com="usr";
+	data.tok=user.tok();
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "https://nile16.nu:1208/", true);
+	xhr.onreadystatechange = function(){
+		if(this.readyState == 4 && this.status == 200) {
+		}
+	}
+	xhr.send(JSON.stringify(data));
+}
 	
 function updatePosition(pos){
 	var xhr = new XMLHttpRequest();
@@ -313,14 +303,12 @@ function stopGPS(){
 }  
 
   function position_found(pos) {
-	console.log("posfound");
     if (!marker){
 		var icon = L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" src="'+user.pic+'"></div><div class="iconName" onclick="event.stopPropagation()">'+user.una+'</div>',iconAnchor:[12, 12]});
 		marker = L.marker([pos.coords.latitude, pos.coords.longitude], {draggable:false, icon:icon}).addTo(map);
 		}
 	else{
 		marker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
-		//marker.update();
 		}
 	checkDistances();
   }
@@ -410,6 +398,7 @@ function checkForHealing(){
 		if ((pointsList[i][1]==1)&&(distance(lat,lng,pointsList[i][2][0],pointsList[i][2][1])<50)){
 			user.hea=user.hea+1;
 			setBar('bar1',user.hea);
+			updateUserDataToServer();
 			break;
 		}
 	}
@@ -419,7 +408,7 @@ function checkForHealing(){
 function startGame(g) {
 	gameFrame.style.display = "block";
 	closeGameFrame.style.display = "block";
-    document.getElementById('gameFrame').src = "https://nile16.nu/pf/game"+g+".html?acc="+user.acc+"&tok="+user.tok();
+    document.getElementById('gameFrame').src = "https://nile16.nu/pf/game"+g+"/index.html?acc="+user.acc+"&tok="+user.tok();
 	closeMessage();
 }
 
@@ -445,7 +434,6 @@ function loadPoints(){
 			for (i=0;i<pointsList.length;i++){
 				markers[i]=L.marker([pointsList[i].lat,pointsList[i].lon],{draggable:false, icon:L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" onclick="markerClicked('+i+')" src="icons/'+pointsList[i].typ+'.png"></div>',iconAnchor:[8, 8]})}).addTo(map);
 			}
-		console.log(pointsList);
 		}
 	}
 	xhr.send(JSON.stringify({com:"poi",acc:user.acc,tok:user.tok()}));
@@ -456,6 +444,9 @@ function markerClicked(m){
 	if (pointsList[m].gam) mess += '<br><button onclick="startGame('+pointsList[m].gam+')" >Play</button>';
 	showMessage(mess);
 }
+
+
+
 
 
 

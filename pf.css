@@ -49,7 +49,7 @@
 	
 #bar1Wrap, #bar2Wrap {
 	position: absolute;
-	z-index:3;
+	z-index:6;
 	height: 20px;
 	width: 340px;
 	left: 50%;
@@ -75,7 +75,6 @@
 	height: 100%;
 	right:100%;
 	border-radius: 10px;
-	background-color:#8CFF47;
 }
 
 #bar1 {
@@ -93,6 +92,29 @@
 	color:#ffffff;
 	text-align:center;
 }
+
+#profileBox {
+	position: absolute;
+	z-index:7; 
+	top: 50%;
+	left: 50%;
+	margin-right: -50%;
+	transform: translate(-50%, -50%);
+	width:100%;
+	height:100%;
+	max-width:504px;
+	max-height:768px;
+	color:white; 
+	background-color:#000000;
+	font-size:20px;
+	text-align:center;
+	display:none;
+}
+
+#profileBox div{
+	display:inline-block;
+}
+
 
 #buttonRow {
 	position:absolute;
@@ -113,7 +135,6 @@
 .button {
 	position:relative;
 	float:left;
-
 	width:25%;
 	height:100%;
 }
@@ -125,7 +146,6 @@
 	left: 50%;
 	margin-right: -50%;
 	transform: translate(-50%, -50%);
-
 	height:70%;
 }
 
@@ -173,6 +193,11 @@
 	transform: translate(-50%, -50%);
 }
 
+#message button{
+	color:#F6C760;
+	background-color:#5C4B42;
+}
+
 #closeMessageButton {
 	position: absolute;
 	top: 0px;
@@ -207,27 +232,6 @@
 	cursor: pointer; 
 }
 
-#profileBox {
-	position: absolute;
-	z-index:5; 
-	top: 50%;
-	left: 50%;
-	margin-right: -50%;
-	transform: translate(-50%, -50%);
-	width:100%;
-	height:100%;
-	max-width:504px;
-	max-height:768px;
-	color:white; 
-	background-color:#000000;
-	font-size:20px;
-	text-align:center;
-	display:none;
-}
-
-#profileBox div {
-	display: inline;
-}
 
 #loginBox {
 	position: absolute;
@@ -281,7 +285,7 @@
 #dimmer {
 	width:100%;  
 	height:100%;  
-	z-index:4; 
+	z-index:6; 
 	display:block;  
 	position:absolute; 
 	background-color:#000000; 
@@ -384,3 +388,6 @@ a:link    {color:#ffffff;text-decoration:none;}  /* unvisited link */
 a:visited {color:#ffffff;text-decoration:none;}  /* visited link */
 a:hover   {color:#FF0000;text-decoration:none;}  /* mouse over link */
 a:active  {color:#FF0000;text-decoration:none;}  /* selected link */ 
+
+
+

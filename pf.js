@@ -85,17 +85,17 @@ https.createServer( serverOptions, (req,res) => {
 					else {
 						var update={};
 						update.$set={};
-						update.$inc={};
+						//update.$inc={};
 						if (postObj.una) update.$set.una=postObj.una;
 						if (postObj.pic) update.$set.pic=postObj.pic;
 						if (postObj.ski) update.$set.ski=postObj.ski;
 						if (postObj.wea) update.$set.wea=postObj.wea;
 						if (postObj.sou) update.$set.sou=postObj.sou;
-						if (postObj.hea) update.$inc.hea=postObj.hea;
-						if (postObj.lev) update.$inc.lev=postObj.lev;
-						if (postObj.spd) update.$inc.spd=postObj.spd;
-						if (postObj.ata) update.$inc.ata=postObj.ata;
-						if (postObj.def) update.$inc.def=postObj.def;
+						if (postObj.hea) update.$set.hea=postObj.hea;
+						if (postObj.lev) update.$set.lev=postObj.lev;
+						if (postObj.spd) update.$set.spd=postObj.spd;
+						if (postObj.ata) update.$set.ata=postObj.ata;
+						if (postObj.def) update.$set.def=postObj.def;
 
 						MongoClient.connect(dburl, (err, db) => {
 							db.collection('users').update({acc:postObj.acc,uid:userInfo.id}, update, (err, r) => { 

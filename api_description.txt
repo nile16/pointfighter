@@ -13,12 +13,12 @@ Data:
 	"una" : <string> username (optional),
 	"pic" : <string> url to picture (optional),
 	"ski" : <int> Change skin to this number (optional),
-	"wea" : <int> Change skin to this number (optional),
-	"hea" : <signed int> increase health with this value (optional),
-	"lev" : <signed int> increase level with this value (optional),
-	"spd" : <signed int> increase speed with this value (optional),
-	"ata" : <signed int> increase attack level with this value (optional),
-	"def" : <signed int> increase defence level with this value (optional)
+	"wea" : <int> Change weapon to this number (optional),
+	"hea" : <int> set health to this value (optional),
+	"lev" : <int> set level to this value (optional),
+	"spd" : <int> set speed to this value (optional),
+	"ata" : <int> set attack level to this value (optional),
+	"def" : <int> set defence level to this value (optional)
 }
 
 Response:
@@ -80,8 +80,8 @@ Response:
 	"pic" : "http://kent.se/mypic.jpg",
 	"ski" : 3,
 	"wea" : 1,
-	"hea" : 47,
-	"lev" : 24,
+	"hea" : 50,
+	"lev" : 20,
 	"spd" : 50,
 	"ata" : 50,
 	"def" : 50
@@ -94,8 +94,8 @@ Request:
 	"acc" : "google",
 	"tok" : "jhgJyjyKUYfytkFkfUyf.jgLJggygLglluuYuyuyguy",
 	"com" : "usr",
-	"hea" : -3,
-	"lev" : 4
+	"hea" : 55,
+	"lev" : 25
 }
 
 Response:
@@ -105,8 +105,8 @@ Response:
 	"pic" : "http://kent.se/mypic.jpg",
 	"ski" : 3,
 	"wea" : 1,
-	"hea" : 47,
-	"lev" : 24,
+	"hea" : 55,
+	"lev" : 25,
 	"spd" : 50,
 	"ata" : 50,
 	"def" : 50
