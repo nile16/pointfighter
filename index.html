@@ -12,11 +12,15 @@
 <script src="leaflet/leaflet.js"></script> 
 <script src="screenfull.js"></script>
 <script src="https://apis.google.com/js/platform.js" ></script>
-<script src="//connect.facebook.net/en_US/sdk.js" id="facebook-jssdk" ></script>
+<script src="//connect.facebook.net/en_US/sdk.js#version=v2.8&appId=360731194320516&status=true&cookie=true&xfbml=true" id="facebook-jssdk" ></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.js" integrity="sha256-tA8y0XqiwnpwmOIl3SGAcFl2RvxHjA8qp0+1uCGmRmg=" crossorigin="anonymous"></script>
+
+<!-- Fontawsome CDN -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>                                                                                
                                                                                   
                                                                                   
-<body>                                                                            
+<body>
    <div  id='wrapper' >
     <iframe id="gameFrame" src=""></iframe>
 	<div id="closeGameFrame" onclick="closeGame()"><img src="icons/close.png"></div>
@@ -34,7 +38,7 @@
 <!--		<div class="button" id='b2' ><IMG id="loginButton"      src="icons/b2.png"  title="Logout" onclick="logout();" ></div> -->
 		<div class="button" id='b3' ><IMG id="profileButton"    src="icons/b3.png"  title="Menu" onclick="showProfileBox();" ></div>
 		<div class="button" id='b4' ><IMG id="mapButton"        src="icons/b4.png"  title="Maps" onclick="showMapMenu();" ></div>
-		<div class="button" id='b5' ><IMG id="fullScreenButton" src="icons/b51.png" title="Request Full Screen" onclick="screenfull.request();" ></div>
+		<div class="button" id='b5' ><IMG id="fullScreenButton" src="icons/b51.png" title="Request Full Screen" onclick="if (user.sou) acc_click_sound.play(); screenfull.request();" ></div>
 	</div>
     <div id='main' >
 		<div id='map' ></div>
@@ -60,7 +64,88 @@
 		<!--<div class="loginButton" onclick="hideLoginBox()">Cancel</div>-->
 	</div>
 	<div id='profileBox' >
-		<br>
+		<!-- Jesper's code -->
+        <!-- Top Navbar -->
+        <nav class="navbar" id="topNavbar">
+            <button id="optionbutton" onclick="showOption()"><i class="fa fa-cog" aria-hidden="true"></i></button>
+
+            <div id="optionDiv">
+                <button id="changeNameButton" onclick="showForm()" >Change Name</button>
+                <button id="volumeButton" onclick="toggleSound()"></button>
+                <button id="logoutButton" onclick="logout()" ><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</button>
+            </div>
+        </nav>
+
+        <div id="changeNameForm">
+            <h1>Type your nickname</h1><br>
+            <input type="text" id="newNick" style="width: 200px;">
+            <br><br>
+            <button class="closeButton" onclick="changeNick(newNick.value)">Submit</button>
+        </div> 
+
+        <div id="wrapperDiv">
+
+            <div id="userNameDiv">
+                
+            </div>
+
+            <div id="showCharacterDiv">
+                <img id="skinPic" style="width: 200px; height: 300px;" class="imgAvatar">
+            </div>
+
+            <div id="skinButtonDiv">
+                <button id="skinButton" onclick="showSkinDiv()">Skin</button>
+                <button id="weaponButton" onclick="showWeaponDiv()">Weapon</button>
+            </div>
+
+            <div id="SkinsDiv">
+                <h2>Select a Character</h2>
+                <button onclick="showSkinDiv()" class="closeButton">Close</button>
+                <div>
+                    <img src="img/s1.jpg" style="width: 200px; height: 300px;" class="imgAvatar"><br>
+                    <button class="selectButton" onclick="selectSkin(1)">Select</button><br><br>
+                </div>
+                <div>
+                    <img src="img/s2.jpg" style="width: 200px; height: 300px;" class="imgAvatar"><br>
+                    <button class="selectButton" onclick="selectSkin(2)">Select</button><br><br>
+                </div>
+                <div>
+                    <img src="img/s3.jpg" style="width: 200px; height: 300px;" class="imgAvatar"><br>
+                    <button class="selectButton" onclick="selectSkin(3)">Select</button><br><br>
+                </div>
+                <div>
+                    <img src="img/s4.jpg" style="width: 200px; height: 300px;" class="imgAvatar"><br>
+                    <button class="selectButton" onclick="selectSkin(4)">Select</button><br><br><br>
+                </div>
+                <button onclick="showSkinDiv()" class="closeButton">Close</button>
+            </div>
+
+
+            <div id="weaponDiv">
+                <h2>Select a weapon</h2>
+                <button onclick="showWeaponDiv()" class="closeButton">Close</button>
+
+                <div>
+                    <img src="img/sword.jpg" style="width: 200px; height: 300px;" class="imgAvatar"><br>
+                    <button class="selectButton" onclick="selectWeapon(1)">Select</button><br><br>
+                </div>
+
+                <div>
+                    <img src="img/bow.jpg" style="width: 200px; height: 300px;" class="imgAvatar"><br>
+                    <button class="selectButton" onclick="selectWeapon(2)">Select</button><br><br><br>
+                </div>
+
+                <button onclick="showWeaponDiv()" class="closeButton">Close</button>
+            </div>
+        </div>
+
+        <!-- Bottom Navbar -->
+        <nav class="navbar" id="bottomNavbar">
+            <button id="gpsButton" onclick="hideProfileBox()"><i class="fa fa-map-marker" aria-hidden="true"></i></button>
+        </nav>
+		<!-- End of Jesper's code -->
+
+<!--		<br>
 		<img id="userPicDiv"><br>
 		Nick: <div id="userNameDiv" contenteditable="true"></div><br>
 		Health: <div id="userHealthDiv"></div><br>
@@ -72,7 +157,7 @@
 		Defence: <div id="userDefenceDiv"></div><br>
 		<br>
 		<button onclick="saveProfile();">QUIT and SAVE</button>
-		<button onclick="logout();">LOGOUT</button><br>
+		<button onclick="logout();">LOGOUT</button><br>-->
 	</div>
 	<div id='message' ></div>
    </div>
@@ -83,19 +168,24 @@
 
 
 
+if (location.protocol == 'http:')
+  location.href = location.href.replace(/^http:/, 'https:')
+
+
+
 //Initiate Facebook
-window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '360731194320516',
-      cookie     : true,
-      xfbml      : true,
-      version    : 'v2.8'
-    });
-    FB.AppEvents.logPageView(); 
-  	FB.getLoginStatus(function(response) {
-		if (response.status=="connected") onSignInFacebook();
-	});
-  };
+//window.fbAsyncInit = function() {
+//    FB.init({
+//      appId      : '360731194320516',
+//      cookie     : true,
+//      xfbml      : true,
+//      version    : 'v2.8'
+//    });
+//    FB.AppEvents.logPageView(); 
+//  	FB.getLoginStatus(function(response) {
+//		if (response.status=="connected") onSignInFacebook();
+//	});
+//  };
 
 //Initiate Google  
 gapi.load('auth2', function() {
@@ -128,16 +218,18 @@ function hideLoginBox(){
 
 //Show the profile page
 function showProfileBox(){
-	//document.getElementById('dimmer').style.display     = 'block'; 
+	if (user.sou) click_sound.play();
+	document.getElementById('dimmer').style.display     = 'block'; 
 	document.getElementById('profileBox').style.display = 'block';
 }
 
 //Hide the profile page and save profil data to server
-function saveProfile(){
+function hideProfileBox(){
+	if (user.sou) click_sound.play();
 	document.getElementById('profileBox').style.display = 'none';
-	removeMyMarkerFromMap();
-	user.una=userNameDiv.innerText;
-	updateUserDataToServer();
+    document.getElementById('dimmer').style.display     = 'none'; 
+	optionDiv.style.display='none';
+	changeNameForm.style.display='none';
 }
 
 function removeMyMarkerFromMap(){
@@ -149,8 +241,8 @@ function removeMyMarkerFromMap(){
 
 function setBar(bar,procent){
 	var text;
-	if ((bar=="bar1")||((bar=="bar1p"))) text = "Health: "+procent+"%"
-	if ((bar=="bar2")||((bar=="bar2p"))) text = "Level:  "+procent+"%"
+	if ((bar=="bar1")||((bar=="bar1p"))) text = "Health: "+procent+"%";
+	if ((bar=="bar2")||((bar=="bar2p"))) text = "Level:  "+procent;
 	document.getElementById(bar+'text').innerText = text;
 	procent = 100 - procent + "%";
 	document.getElementById(bar).style.right = procent;
@@ -176,7 +268,9 @@ function onSignInFacebook(){
 }
 
 function logout(){
-	saveProfile();
+	if (user.sou) logout_sound.play();
+	hideProfileBox();
+	updateUserDataToServer();
     if (user.acc=="google") gapi.auth2.getAuthInstance().signOut();
     if (user.acc=="facebook")FB.logout();
 	showLoginBox();
@@ -186,6 +280,7 @@ function logout(){
 	user.pic = false;
 	user.ski = false;
 	user.wea = false;
+	user.sou = false;
 	user.spd = false;
 	user.ata = false;
 	user.def = false;
@@ -205,11 +300,11 @@ function logout(){
         if (screenfull.isFullscreen) {
 		  document.getElementById('fullScreenButton').setAttribute( "src", "icons/b50.png" ); 
           document.getElementById('fullScreenButton').setAttribute( "title", "Exit Full Screen" ); 
-          document.getElementById('fullScreenButton').setAttribute( "onClick", "javascript: screenfull.exit();" ); 
+          document.getElementById('fullScreenButton').setAttribute( "onClick", "javascript: if (user.sou) acc_click_sound.play(); screenfull.exit();" ); 
         } else {
 		  document.getElementById('fullScreenButton').setAttribute( "src", "icons/b51.png" ); 
           document.getElementById('fullScreenButton').setAttribute( "title", "Request Full Screen" ); 
-          document.getElementById('fullScreenButton').setAttribute( "onClick", "javascript: screenfull.request();" ); 
+          document.getElementById('fullScreenButton').setAttribute( "onClick", "javascript: if (user.sou) acc_click_sound.play(); screenfull.request();" ); 
         }
 	  } );
 	}
@@ -226,6 +321,7 @@ function loggedIn(){
 				for (var attrname in data) user[attrname] = data[attrname]; 
 				updateUserDataProfile()
 				}
+			if (user.sou) login_sound.play();
 			startGPS();
 			startPosUpdates();
 			loadPoints();
@@ -238,21 +334,20 @@ function loggedIn(){
 function updateUserDataProfile(){
 	setBar('bar1',user.hea);
 	setBar('bar2',user.lev);
-	userPicDiv.src           = user.pic;
 	userNameDiv.innerText    = user.una;
-	userHealthDiv.innerText  = user.hea;
-	userLevelDiv.innerText   = user.lev;
-	userSkinDiv.innerText    = user.ski;
-	userWeaponDiv.innerText  = user.wea;
-	userSpeedDiv.innerText   = user.spd;
-	userAttackDiv.innerText  = user.ata;
-	userDefenceDiv.innerText = user.def;
+	newNick.value            = user.una;
+	skinPic.src              = "img/s"+user.ski+".jpg";
+	if (user.sou) 
+		volumeButton.innerHTML   = "Sound is on";
+	else
+		volumeButton.innerHTML   = "Sound is off";
 }
 
 function updateUserDataToServer(){
-	var data = Object.create(user);
+	var data = JSON.parse(JSON.stringify(user));
 	data.com="usr";
 	data.tok=user.tok();
+	delete data.err;
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", "https://nile16.nu:1208/", true);
 	xhr.onreadystatechange = function(){
@@ -282,12 +377,10 @@ function updatePosition(pos){
 	xhr.send(JSON.stringify({com:"pos",acc:user.acc,tok:user.tok(),pos:pos}));
 }
 
-
-
 function startGPS(){
 	posWatch=navigator.geolocation.watchPosition(
 		function(pos){ 
-			if (pos.coords.accuracy<50000) // Change to lower value before launch
+			if (pos.coords.accuracy<50)
 				position_found(pos); 
 			else
 				position_not_found();
@@ -302,7 +395,7 @@ function stopGPS(){
 	navigator.geolocation.clearWatch(posWatch);
 }  
 
-  function position_found(pos) {
+function position_found(pos) {
     if (!marker){
 		var icon = L.divIcon({className: 'my-div-icon',html:'<div><img class="iconImage" src="'+user.pic+'"></div><div class="iconName" onclick="event.stopPropagation()">'+user.una+'</div>',iconAnchor:[12, 12]});
 		marker = L.marker([pos.coords.latitude, pos.coords.longitude], {draggable:false, icon:icon}).addTo(map);
@@ -310,12 +403,12 @@ function stopGPS(){
 	else{
 		marker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
 		}
-	checkDistances();
-  }
+	//checkDistances();
+}
 
-  function position_not_found() {
+function position_not_found() {
 	removeMyMarkerFromMap();
-  }
+}
 
 function startPosUpdates(){
 	posUpdates = setInterval(function(){
@@ -342,15 +435,21 @@ function stopHealingChecks(){
 }
   
 function zoomToUser(){
-	if (marker) map.setView(marker.getLatLng(), 16);
+	if (user.sou) click_sound.play();
+	if (marker) 
+		map.setView(marker.getLatLng(), 16);
+	else
+		showMessage("The GPS has not reportet your position.");
 }  
  
 function showMapMenu(){
+	if (user.sou) click_sound.play();
     document.getElementById('dimmer').style.display  = 'block'; 
     document.getElementById('mapBox').style.display  = 'block'; 
 }
  
 function setMap(m){
+	if (user.sou) acc_click_sound.play();
 	map.removeLayer(currentMap); 
 	currentMap=m;
 	map.addLayer(m); 
@@ -365,6 +464,7 @@ function setMap(m){
   }  
   
   function closeMessage() {
+	if (user.sou) click_sound.play();
     document.getElementById('message').style.display = 'none'; 
     document.getElementById('dimmer').style.display  = 'none'; 
   }
@@ -381,45 +481,56 @@ function distance(lat1, lon1, lat2, lon2) {
 	return dist
 }
 
-function checkDistances(){
-	var lat = marker.getLatLng().lat;
-	var lng = marker.getLatLng().lng;
-	for (i=0;i<markers.length;i++){
-		if (distance(lat,lng,targets[i].getLatLng().lat,targets[i].getLatLng().lng)<10){
-			targets[i].setIcon(markerIcon2);
-		}
-	}
-}
+//function checkDistances(){
+//	var lat = marker.getLatLng().lat;
+//	var lng = marker.getLatLng().lng;
+//	for (i=0;i<markers.length;i++){
+//		if (distance(lat,lng,targets[i].getLatLng().lat,targets[i].getLatLng().lng)<10){
+//			targets[i].setIcon(markerIcon2);
+//		}
+//	}
+//}
 
 function checkForHealing(){
-	var lat = marker.getLatLng().lat;
-	var lng = marker.getLatLng().lng;
-	for (i=0;i<pointsList.length;i++){
-		if ((pointsList[i][1]==1)&&(distance(lat,lng,pointsList[i][2][0],pointsList[i][2][1])<50)){
-			user.hea=user.hea+1;
-			setBar('bar1',user.hea);
-			updateUserDataToServer();
-			break;
+	if (user.hea<100){
+		var lat = marker.getLatLng().lat;
+		var lng = marker.getLatLng().lng;
+		for (i=0;i<pointsList.length;i++){
+			if ((pointsList[i].typ==1)&&(distance(lat,lng,pointsList[i].lat,pointsList[i].lon)<50)){
+				user.hea+=1;
+				if (user.sou) up_sound.play();
+				setBar('bar1',user.hea);
+				updateUserDataToServer();
+				break;
+			}
 		}
 	}
 }
 
-
 function startGame(g) {
-	gameFrame.style.display = "block";
-	closeGameFrame.style.display = "block";
-    document.getElementById('gameFrame').src = "https://nile16.nu/pf/game"+g+"/index.html?acc="+user.acc+"&tok="+user.tok();
-	closeMessage();
+	if (user.sou) click_sound.play();
+	if (user.hea>=10){
+		gameFrame.style.display = "block";
+		closeGameFrame.style.display = "block";
+		document.getElementById('gameFrame').src = "https://nile16.nu/pf/game"+g+"/index.html?acc="+user.acc+"&tok="+user.tok();
+		closeMessage();
+	}
+	else showMessage("Your health must be 10% or more to play.<br>Go to a healing site.")
 }
 
 function closeGame(){
+	if (user.sou) click_sound.play();
 	gameFrame.style.display = "none";
 	closeGameFrame.style.display = "none";
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", "https://nile16.nu:1208", true);
 	xhr.onreadystatechange = function(){
 		if(this.readyState == 4 && this.status == 200) {
-			updateUserProfile(JSON.parse(xhr.responseText));
+			var data = JSON.parse(xhr.responseText);
+			if (!data.err){
+				for (var attrname in data) user[attrname] = data[attrname]; 
+				updateUserDataProfile()
+			}
 		}
 	}
 	xhr.send(JSON.stringify({com:"usr",acc:user.acc,tok:user.tok()}));
@@ -440,12 +551,104 @@ function loadPoints(){
 }
 
 function markerClicked(m){
+	if (user.sou) click_sound.play();
 	var mess = pointsList[m].txt;
-	if (pointsList[m].gam) mess += '<br><button onclick="startGame('+pointsList[m].gam+')" >Play</button>';
+	if (pointsList[m].gam){
+		if (marker&&(distance(marker.getLatLng().lat,marker.getLatLng().lng,pointsList[m].lat,pointsList[m].lon)<100)){
+			mess += '<br><br><button onclick="startGame('+pointsList[m].gam+')" >Play</button>';
+		}else{
+			mess += '<br><br>You must be within 100 meters of this point to play.<br>';
+		}
+	}
 	showMessage(mess);
 }
 
+function selectSkin(s){
+	if (user.sou) acc_click_sound.play();
+	user.ski=s;
+	SkinsDiv.style.display='none';
+	updateUserDataProfile();
+	updateUserDataToServer();
+}
+	
+function selectWeapon(w){
+	if (user.sou) acc_click_sound.play();
+	user.wea=w;
+	weaponDiv.style.display='none';
+	updateUserDataProfile();
+	updateUserDataToServer();
+}
 
+function changeNick(name){
+	if (user.sou) acc_click_sound.play();
+	user.una=name;
+	changeNameForm.style.display='none';
+	optionDiv.style.display='none';
+	removeMyMarkerFromMap();
+	updateUserDataProfile();
+	updateUserDataToServer();
+}	
+
+function toggleSound(){
+	if (user.sou){
+		user.sou=0;
+		}
+	else{
+		user.sou=1;
+		acc_click_sound.play();
+	}
+	updateUserDataProfile();
+	updateUserDataToServer();
+};
+
+
+
+// Jesper's functions
+
+function showOption(){
+	if (user.sou) click_sound.play();
+    var div = document.getElementById("optionDiv");
+    if (div.style.display !== "block") {
+        div.style.display = "block";
+    }
+    else {
+        div.style.display = "none";
+		changeNameForm.style.display='none';
+    }
+};
+
+function showWeaponDiv(){
+	if (user.sou) click_sound.play();
+    var div = document.getElementById("weaponDiv");
+    if (div.style.display !== "block") {
+        div.style.display = "block";
+    }
+    else {
+        div.style.display = "none";
+    }
+};
+
+function showForm(){
+	if (user.sou) click_sound.play();
+    var div = document.getElementById("changeNameForm");
+    if (div.style.display !== "block") {
+        div.style.display = "block";
+    }
+    else {
+        div.style.display = "none";
+    }
+};
+
+function showSkinDiv(){
+	if (user.sou) click_sound.play();
+    var div = document.getElementById("SkinsDiv");
+    if (div.style.display !== "block") {
+        div.style.display = "block";
+    }
+    else {
+        div.style.display = "none";
+    }
+};
 
 
 
@@ -476,6 +679,11 @@ function markerClicked(m){
 
   map.attributionControl.setPrefix("");
 
+  click_sound = new Audio('sounds/click.wav');
+  acc_click_sound = new Audio('sounds/acc_click.wav');
+  login_sound = new Audio('sounds/login.wav');
+  logout_sound = new Audio('sounds/logout.wav');
+  up_sound = new Audio('sounds/up2.wav');
 
   var user={};
   
@@ -508,8 +716,7 @@ function markerClicked(m){
   // map.addLayer(markers);
   map.fitBounds([[0,-180],[0,180]]);
 
-	
-	
+
 
   </script>                              
 

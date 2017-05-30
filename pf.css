@@ -105,15 +105,14 @@
 	max-width:504px;
 	max-height:768px;
 	color:white; 
-	background-color:#000000;
+	background-image: url("./img/wallpaper1.jpg");
+    background-repeat: no-repeat;
 	font-size:20px;
 	text-align:center;
 	display:none;
+	overflow:scroll;
 }
 
-#profileBox div{
-	display:inline-block;
-}
 
 
 #buttonRow {
@@ -208,7 +207,7 @@
 
 #mapBox {
 	position: absolute;
-	z-index:5; 
+	z-index:7; 
 	top: 50%;
 	left: 50%;
 	margin-right: -50%;
@@ -337,57 +336,254 @@
 }
 
 
-/*
-@media (orientation: landscape) {
-	#buttonRow {
-		left:10px;
-		width:46px;
-		height:336px;
-		top: 50%;
-		transform: translate(0%, -50%);
-		}
-	#main {
-		height:100%;
-		left:0px;
-		right:0px;
-		}
-	.button {
-		width:100%;
-		height:20%;
-		}
-	.button img {
-		width:70%;
-		}
-}
-
-@media (orientation: portrait) {
-	#buttonRow {
-		bottom:10px;
-		width:336px;
-		height:46px;
-		left: 50%;
-		transform: translate(-50%, 0%);
-		}
-	#main {
-		width:100%;
-		top:0px;
-		bottom:0px;
-		}
-	.button {
-		width:20%;
-		height:100%;
-		}
-	.button img {
-		height:70%;
-		}
-}
-*/
-
 
 a:link    {color:#ffffff;text-decoration:none;}  /* unvisited link */
 a:visited {color:#ffffff;text-decoration:none;}  /* visited link */
 a:hover   {color:#FF0000;text-decoration:none;}  /* mouse over link */
 a:active  {color:#FF0000;text-decoration:none;}  /* selected link */ 
 
+/* Jespers CSS */
+
+#wrapperDiv{
+    margin-top: 40px;
+    margin-bottom: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+h1{color: white; font-size: 25px; margin: 0; padding: 1%;}
+h2{color: white; font-size:30px; text-shadow: 2px 2px 2px black; margin-bottom: 10px;}
+h3{font-size: 10px;}
+
+
+#topNavbar{
+    position: absolute;
+    top: 0;
+    margin: 0;
+    background-color: #222;
+    width: 100%;
+    height: 40px;
+}
+#bottomNavbar{
+    padding-top: 8px;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    margin: 0;
+    background-color: #222;
+    width: 100%;
+    height: 40px;
+}
+#optionDiv{
+    display: none; 
+    margin: 0; 
+}
+
+#optionbutton{
+    margin-top: 10px;
+    margin-right: 10px;
+    background-color: #222;
+    float: right;
+    border-width: 0;
+    font-size: 20px;
+    color: white;
+
+}
+#changeNameForm{
+    padding: 20px;
+    width: auto;
+    margin-top: 145px;
+    display: none;
+    background-color: #222;
+    text-align: center;
+    color: white;
+    font-size: 17px;
+    box-shadow: 3px 3px 3px black;
+
+}
+
+/* All buttons */
+#volumeButton{
+    width: 100%;
+    height: 40px;
+    background-color: #222;
+    color: white;
+    font-size: 20px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #333;
+}
+#contactButton{
+    width: 100%;
+    height: 40px;
+    background-color: #222;
+    color: white;
+    font-size: 20px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #333;
+}
+#logoutButton{
+    width: 100%;
+    height: 40px;
+    background-color: #222;
+    color: white;
+    font-size: 20px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #333;
+}
+#changeNameButton{
+    width: 100%;
+    height: 40px;
+    background-color: #222;
+    color: white;
+    font-size: 20px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #333;
+}
+#submitButton{
+    background-color: forestgreen;
+    color: white;
+    font-size: 20px;
+    border-width: medium;
+    border-color: forestgreen;
+    border-radius: 10px;
+}
+.closeButton{
+    background-color: maroon;
+    color: white;
+    font-size: 20px;
+    border-width: medium;
+    border-color: maroon;
+    border-radius: 10px;
+}
+.selectButton{
+    background-color: forestgreen;
+    color: white;
+    font-size: 20px;
+    border-width: medium;
+    border-color: forestgreen;
+    border-radius: 10px;
+}
+
+
+
+#showCharacterDiv{
+    text-align: center;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.imgAvatar{
+    border-width: 4px;
+    border-style: solid;
+    border-color: black;
+    border-radius: 10px;
+}
+
+
+#UserNameDiv{
+    text-align: center;
+    width: auto;
+    background-color: #50682b;
+    height: 120px;
+
+}
+
+
+#skinButtonDiv{
+    text-align: center;
+    background-color: #50682b;
+    margin-left: 20%;
+    margin-right: 20%;
+    padding: 3px;
+    border-radius: 20px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: black;
+    border-radius: 20px;
+}
+#skinButton{
+    width: 100px;
+    height: 30px;
+    background-color: #222;
+    color: white;
+    font-size: 20px;
+    border-width: 0px;
+    border-radius: 20px;
+}
+#weaponButton{
+    width: 100px;
+    height: 30px;
+    background-color: #222;
+    color: white;
+    font-size: 20px;
+    border-width: 0px;
+    border-radius: 20px;
+}
+
+
+#SkinsDiv{
+    position: absolute;
+    overflow: hidden;
+    z-index: 9999;
+    padding: 20px;
+    top: 5px;
+    left: 20px;
+    right: 20px;
+    display: none;
+    text-align: center;
+    background-color: #32682c;
+    border-width: medium;
+    border-style: solid;
+    border-color: black;
+    border-radius: 8px;
+}
+#weaponDiv{
+    position: absolute;
+    overflow: hidden;
+    z-index: 9999;
+    padding: 20px;
+    top: 0px;
+    left: 20px;
+    right: 20px;
+    display: none;
+    text-align: center;
+    background-color: #32682c;
+}
+
+
+#skin1Div{
+    display: none;
+    text-align: center;
+    display: block;
+    padding: 2%;
+}
+
+/*Buttons for the User in bottom Navbar*/
+#userButton{
+    width: 100px;
+    height: 30px;
+    background-color: #222;
+    color: white;
+    font-size: 20px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #555;
+    border-radius: 20px;
+}
+#gpsButton{
+    width: 100px;
+    height: 30px;
+    background-color: #222;
+    color: white;
+    font-size: 20px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #555;
+    border-radius: 20px;
+}
 
 

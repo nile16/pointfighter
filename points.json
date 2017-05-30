@@ -10,8 +10,7 @@
 { "pid":10,"typ":1,"gam":0,"lat":56.22975,"lon":15.13352,"txt":"<b>Bräkne-Hoby Jättegryta</b><br>"}
 { "pid":11,"typ":1,"gam":0,"lat":56.23663,"lon":15.27620,"txt":"<b>Djupaforsklyftan</b><br>Här rinner Ronnebyån genom en 18 m djup ränna som bara är 1,5 m bred. Branta sluttningar med stora flyttblock och vacker bokskog reser sig över ån."}
 { "pid":12,"typ":1,"gam":0,"lat":56.25340,"lon":15.33798,"txt":"<b>Anglestue Grotta</b><br>"}
-{ "pid":13,"typ":1,"gam":0,"lat":56.17114,"lon":14.96547,"txt":"<b>Hitlersten</b><br>Här höggs granit till Germania."}
-{ "pid":14,"typ":2,"gam":1,"lat":56.16467,"lon":14.86941,"txt":"<b>Utvandrarmonumentet</b><br>"}
+{ "pid":14,"typ":2,"gam":1,"lat":56.16467,"lon":14.86941,"txt":"<b>Utvandrarmonumentet</b>"}
 { "pid":15,"typ":1,"gam":0,"lat":56.14925,"lon":14.84510,"txt":"<b>Höga Rör</b><br>Ett fem meter högt gravröse daterat till bronsåldern, benämnt Höga rör, vilket är Blekinges största."}
 { "pid":16,"typ":1,"gam":0,"lat":56.53349,"lon":15.60082,"txt":"<b>Dackestenen</b><br>"}
 { "pid":17,"typ":1,"gam":0,"lat":56.41925,"lon":15.68378,"txt":"<b>Nils Dackes Forna Hemvist i Flaken</b><br>"}
@@ -26,3 +25,5 @@
 { "pid":26,"typ":1,"gam":0,"lat":56.44135,"lon":14.52813,"txt":"<b>Rävabacken</b><br>Högsta punkt i Blekinge."}
 { "pid":27,"typ":1,"gam":0,"lat":56.02162,"lon":14.18389,"txt":"<b>Sveriges lägsta punkt</b><br>"}
 { "pid":28,"typ":1,"gam":0,"lat":55.68266,"lon":14.23383,"txt":"<b>Kungagraven</b><br>Kungagraven, även benämnd Kiviksgraven eller Bredarör, är ett gravröse beläget i Kivik i Södra Mellby socken och Simrishamns kommun. Det är en gravplats från bronsåldern, som under historisk tid både förstörts delvis, plundrats och restaurerats till ett icke ursprungligt skick."}
+{ "pid":29,"typ":2,"gam":1,"lat":56.16467,"lon":14.86564,"txt":"<b>BTH</b>"}
+{ "pid":30,"typ":2,"gam":1,"lat":56.15972,"lon":15.13296,"txt":"<b>Väbynäs badplats</b>"}

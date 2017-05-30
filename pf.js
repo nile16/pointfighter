@@ -77,31 +77,30 @@ https.createServer( serverOptions, (req,res) => {
 			MongoClient.connect(dburl, (err, db) => {
 				db.collection('users').find({acc:postObj.acc,uid:userInfo.id}).toArray((err, docs) => {
 					if (docs.length==0){
-						db.collection('users').insert({acc:postObj.acc,uid:userInfo.id,una:userInfo.name,pic:userInfo.pic,ski:1,wea:1,sou:1,hea:0,lev:0,spd:50,ata:50,def:50,adm:false}, (err, r) => { 
+						db.collection('users').insert({acc:postObj.acc,uid:userInfo.id,una:userInfo.name,pic:userInfo.pic,ski:1,wea:1,sou:1,hea:30,lev:0,spd:50,ata:50,def:50,adm:false}, (err, r) => { 
 							db.close();
-							res.end(JSON.stringify({err:false,una:userInfo.name,pic:userInfo.pic,ski:1,wea:1,sou:1,hea:0,lev:0,spd:50,ata:50,def:50}));
+							res.end(JSON.stringify({err:false,una:userInfo.name,pic:userInfo.pic,ski:1,wea:1,sou:1,hea:30,lev:0,spd:50,ata:50,def:50}));
 						});
 					}
 					else {
 						var update={};
 						update.$set={};
 						//update.$inc={};
-						if (postObj.una) update.$set.una=postObj.una;
-						if (postObj.pic) update.$set.pic=postObj.pic;
-						if (postObj.ski) update.$set.ski=postObj.ski;
-						if (postObj.wea) update.$set.wea=postObj.wea;
-						if (postObj.sou) update.$set.sou=postObj.sou;
-						if (postObj.hea) update.$set.hea=postObj.hea;
-						if (postObj.lev) update.$set.lev=postObj.lev;
-						if (postObj.spd) update.$set.spd=postObj.spd;
-						if (postObj.ata) update.$set.ata=postObj.ata;
-						if (postObj.def) update.$set.def=postObj.def;
-
+						if (postObj.hasOwnProperty('una')) update.$set.una=postObj.una;
+						if (postObj.hasOwnProperty('pic')) update.$set.pic=postObj.pic;
+						if (postObj.hasOwnProperty('ski')) update.$set.ski=postObj.ski;
+						if (postObj.hasOwnProperty('wea')) update.$set.wea=postObj.wea;
+						if (postObj.hasOwnProperty('sou')) update.$set.sou=postObj.sou;
+						if (postObj.hasOwnProperty('hea')) update.$set.hea=postObj.hea;
+						if (postObj.hasOwnProperty('lev')) update.$set.lev=postObj.lev;
+						if (postObj.hasOwnProperty('spd')) update.$set.spd=postObj.spd;
+						if (postObj.hasOwnProperty('ata')) update.$set.ata=postObj.ata;
+						if (postObj.hasOwnProperty('def')) update.$set.def=postObj.def;
 						MongoClient.connect(dburl, (err, db) => {
 							db.collection('users').update({acc:postObj.acc,uid:userInfo.id}, update, (err, r) => { 
 								db.collection('users').find({acc:postObj.acc,uid:userInfo.id}).toArray((err, docs) => {
 									db.close();
-									res.end(JSON.stringify({err:false,una:docs[0].una,pic:docs[0].pic,ski:docs[0].ski,wea:docs[0].wea,hea:docs[0].hea,lev:docs[0].lev,spd:docs[0].spd,ata:docs[0].ata,def:docs[0].def}));
+									res.end(JSON.stringify({err:false,una:docs[0].una,pic:docs[0].pic,ski:docs[0].ski,wea:docs[0].wea,sou:docs[0].sou,hea:docs[0].hea,lev:docs[0].lev,spd:docs[0].spd,ata:docs[0].ata,def:docs[0].def}));
 								});
 							});
 						});
@@ -121,7 +120,6 @@ https.createServer( serverOptions, (req,res) => {
 								if (docs[i].pos&&((docs[i].pti+30)>Math.floor(new Date()/1000))) users.push([docs[i].pos,docs[i].una,docs[i].pic]);
 							}
 							res.end(JSON.stringify({err:false,ous:users}));
-							//console.log(users);
 							db.close();
 						});
 				});
@@ -136,13 +134,11 @@ https.createServer( serverOptions, (req,res) => {
 						points.push( { "pid":docs[i].pid,"typ":docs[i].typ,"lat":docs[i].lat,"lon":docs[i].lon,"txt":docs[i].txt,"gam":docs[i].gam } );
 					}
 					res.end(JSON.stringify({err:false,poi:points}));
-					//console.log(points);
 					db.close();
 				});
 			});
 		}
 		else {
-			console.log("Unknow Command");
 			res.end(JSON.stringify({err:'Invalid command'}));
 		}
 	}
