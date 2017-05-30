@@ -59,7 +59,9 @@ function game(user){
 	console.log(user);
 
 	//Increase level 3 points and decrease health 1 point on server
-	updateUserData({lev:3,hea:-1});
+	user.lev += 3;
+	user.hea -= 1;
+	updateUserData({lev:user.lev,hea:user.hea});
 
 }
 
